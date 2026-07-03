@@ -1,0 +1,35 @@
+# See https://github.com/traefik/traefik-helm-chart
+
+deployment:
+  kind: Deployment
+
+# Pin Traefik to the kind "ingress-ready" node and bind the host ports directly,
+# so the cluster's extraPortMappings (8088 -> 80, 8443 -> 443) reach Traefik.
+nodeSelector:
+  ingress-ready: "true"
+tolerations:
+  - key: node-role.kubernetes.io/control-plane
+    operator: Exists
+    effect: NoSchedule
+
+ports:
+  web:
+    hostPort: 80
+  websecure:
+    hostPort: 443
+
+# Host ports carry ingress traffic; a LoadBalancer service just stays <pending> on
+# kind (no cloud LB) and makes `helm --wait` hang, so use a ClusterIP service.
+service:
+  spec:
+    type: ClusterIP
+
+# Make Traefik the default IngressClass so Ingresses without an explicit class
+# (e.g. the kube-prometheus-stack ones) are handled.
+ingressClass:
+  enabled: true
+  isDefaultClass: true
+
+providers:
+  kubernetesIngress:
+    enabled: true

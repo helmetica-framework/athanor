@@ -1,0 +1,79 @@
+{
+  "name": "Athanor Devcontainer",
+  "build": {
+    "dockerfile": "./Dockerfile"
+  },
+  "forwardPorts": [
+    8088,
+    8443,
+    36377,
+    5000
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true
+    },
+    "ghcr.io/mikaello/devcontainer-features/modern-shell-utils:2.0.0": {},
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+      "minikube": "none",
+      "helm": "v3.19.2"
+    },
+    "ghcr.io/eitsupi/devcontainer-features/jq-likes:2": {
+      "yqVersion": "latest"
+    },
+    "ghcr.io/devcontainers/features/nix:1": {}
+  },
+  "postCreateCommand": "./.devcontainer/postCreateCommand.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go",
+        "ms-vscode.makefile-tools",
+        "redhat.vscode-yaml",
+        "timonwong.shellcheck",
+        "eamodio.gitlens",
+        "mhutchie.git-graph",
+        "Grafana.vscode-jsonnet",
+        "asciidoctor.asciidoctor-vscode"
+      ],
+      "settings": {
+        // This has to be set individually to each developers preference
+        // in their local vscode configs.
+        // "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "bash",
+            "icon": "terminal-bash"
+          },
+          "zsh": {
+            "path": "zsh"
+          },
+          "fish": {
+            "path": "fish"
+          },
+          "tmux": {
+            "path": "tmux",
+            "icon": "terminal-tmux"
+          },
+          "pwsh": {
+            "path": "pwsh",
+            "icon": "terminal-powershell"
+          }
+        },
+        // Some jsonnet configs for the languageServer
+        "jsonnet.languageServer.lint": true,
+        "jsonnet.languageServer.tankaMode": false,
+        "jsonnet.languageServer.formatting": {
+          "PadArrays": true
+        },
+        "jsonnet.languageServer.jpath": [
+          "lib/"
+        ],
+        "jsonnet.libPaths": [
+          "/lib"
+        ]
+      }
+    }
+  }
+}

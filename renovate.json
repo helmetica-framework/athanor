@@ -1,0 +1,19 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "kubernetes": {
+    "managerFilePatterns": ["/^hearth/.+\\.ya?ml$/"]
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update versions in Makefiles annotated with a `# renovate:` comment",
+      "managerFilePatterns": ["/(^|/)Makefile$/", "/\\.mk$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)(?: registryUrl=(?<registryUrl>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?\\n[A-Z0-9_]+ \\?= (?<currentValue>[^\\s]+)"
+      ]
+    }
+  ]
+}
