@@ -1,0 +1,26 @@
+name: Ignite
+
+on:
+  pull_request:
+
+jobs:
+  ignite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version: stable
+
+      - name: Run ignite
+        run: make ignite
+
+      - name: Dump cluster state on failure
+        if: failure()
+        run: |
+          export KUBECONFIG=$PWD/.kind/kind-config
+          kubectl get nodes -o wide || true
+          kubectl get pods -A -o wide || true
+          kubectl get events -A --sort-by=.lastTimestamp | tail -50 || true

@@ -7,6 +7,6 @@
 !Makefile
 !README.md
 !renovate.json
-!reagents
 !hearth
 !Makefile.vars.mk
+!.github
