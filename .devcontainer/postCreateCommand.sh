@@ -5,27 +5,28 @@
 sudo git config set --system core.checkStat minimal
 
 mkdir -p "$HOME/.kube"
-kubectl completion bash > /home/vscode/.kube/completion.bash.inc
+kubectl completion bash >/home/vscode/.kube/completion.bash.inc
 printf "
 source /usr/share/bash-completion/bash_completion
 source "$HOME/.kube/completion.bash.inc"
 complete -F __start_kubectl k
-" >> "$HOME/.bashrc"
+" >>"$HOME/.bashrc"
 
 printf "
 source <(kubectl completion zsh)
 complete -F __start_kubectl k
-" >> "$HOME/.zshrc"
+" >>"$HOME/.zshrc"
 
 (
-  set -x; cd "$(mktemp -d)" &&
-  OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
-  ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
-  KREW="krew-${OS}_${ARCH}" &&
-  curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
-  tar zxvf "${KREW}.tar.gz" &&
-  ./"${KREW}" install krew
+	set -x
+	cd "$(mktemp -d)" &&
+		OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
+		ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
+		KREW="krew-${OS}_${ARCH}" &&
+		curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
+		tar zxvf "${KREW}.tar.gz" &&
+		./"${KREW}" install krew
 )
 
 make ignite
-ln -fs ~/.kube/config /workspaces/athanor/.kind/kind-config
+ln -fs /workspaces/athanor/.kind/kind-config ~/.kube/config
