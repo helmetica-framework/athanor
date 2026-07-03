@@ -27,7 +27,7 @@ K8UP_CRD_VERSION ?= v2.15.0
 # renovate: datasource=github-releases depName=cert-manager/cert-manager
 CERTMANAGER_VERSION ?= v1.20.2
 # renovate: datasource=github-releases depName=metallb/metallb
-METALLB_VERSION ?= v0.13.7
+METALLB_VERSION ?= v0.16.0
 
 # PROMETHEUS
 PROM_VALUES=hearth/prometheus/values.yaml
