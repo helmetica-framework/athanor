@@ -101,7 +101,7 @@ $(metallb_sentinel): $(KIND_KUBECONFIG) hearth/metallb/config.yaml
 	@echo "Waiting for metallb webhook to become ready..."
 	kubectl wait --namespace metallb-system \
 		--for=jsonpath='{.subsets[0].addresses[0].ip}' \
-		endpoints/webhook-service --timeout 90s
+		endpoints/metallb-webhook-service --timeout 90s
 	HOSTIP=$$(docker inspect $(DOCKER_CONTAINER) | jq -r '.[0].NetworkSettings.Networks["kind"].Gateway') && \
 	export range="$${HOSTIP}00-$${HOSTIP}50" && \
 	cat hearth/metallb/config.yaml | yq 'select(document_index == 0) | .spec.addresses = [strenv(range)]' | kubectl apply -f -
