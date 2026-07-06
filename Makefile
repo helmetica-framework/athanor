@@ -99,11 +99,14 @@ $(metallb_sentinel): $(KIND_KUBECONFIG) hearth/metallb/config.yaml
 		--selector=app=metallb \
 		--timeout=90s
 	@echo "Waiting for metallb webhook to become ready..."
-	kubectl wait --namespace metallb-system \
-		--for=jsonpath='{.subsets[0].addresses[0].ip}' \
-		endpoints/metallb-webhook-service --timeout 90s
+# The controller pod turns Ready before its webhook server listens (it waits
+# for cert rotation first), so retry the apply until the webhook answers.
 	HOSTIP=$$(docker inspect $(DOCKER_CONTAINER) | jq -r '.[0].NetworkSettings.Networks["kind"].Gateway') && \
 	export range="$${HOSTIP}00-$${HOSTIP}50" && \
-	cat hearth/metallb/config.yaml | yq 'select(document_index == 0) | .spec.addresses = [strenv(range)]' | kubectl apply -f -
+	ok=0; for i in $$(seq 1 30); do \
+		if cat hearth/metallb/config.yaml | yq 'select(document_index == 0) | .spec.addresses = [strenv(range)]' | kubectl apply -f -; then ok=1; break; fi; \
+		echo "metallb webhook not ready yet, retrying ($$i/30)..."; \
+		sleep 3; \
+	done; [ $$ok -eq 1 ]
 	cat hearth/metallb/config.yaml | yq 'select(document_index == 1)' | kubectl apply -f -
 	@touch $@
