@@ -28,5 +28,6 @@ complete -F __start_kubectl k
 		./"${KREW}" install krew
 )
 
+make quench
 make ignite
 ln -fs /workspaces/athanor/.kind/kind-config ~/.kube/config
