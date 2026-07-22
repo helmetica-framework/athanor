@@ -19,7 +19,7 @@ DOCKER_NETWORK ?= kind
 # renovate: datasource=helm depName=traefik registryUrl=https://traefik.github.io/charts
 TRAEFIK_CHART_VERSION ?= 41.0.1
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-PROMETHEUS_CHART_VERSION ?= 87.5.1
+PROMETHEUS_CHART_VERSION ?= 87.19.0
 # renovate: datasource=helm depName=k8up registryUrl=https://k8up-io.github.io/k8up
 K8UP_CHART_VERSION ?= 4.9.0
 # renovate: datasource=github-releases depName=k8up-io/k8up
