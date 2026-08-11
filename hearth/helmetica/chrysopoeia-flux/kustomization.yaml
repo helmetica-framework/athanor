@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Change this to relocate the flux controllers.
+# IMPORTANT: also update the --image-reflector-controller-hostname value in
+# ../chrysopoeia/kustomization.yaml. That DNS name embeds this namespace as a plain
+# string, which kustomize cannot rewrite.
+namespace: hel-flux
+
+resources:
+  # Chryso brings its own flux
+  - github.com/helmetica-framework/chrysopoeia//config/flux?ref=v0.1.0-dev20

@@ -56,6 +56,7 @@ The devcontainer forwards the following ports to your host:
 If you need to (re-)create the cluster manually, simply ignite the furnace to get a kind cluster with all necessary modules:
 
 ```bash
+just quench
 just ignite
 ```
 
@@ -67,6 +68,7 @@ This creates the kind cluster and installs the modules from the `hearth/` folder
 * [k8up](https://k8up.io/) for backups
 * [cert-manager](https://cert-manager.io/) for certificates
 * An internal container registry on `localhost:5000` (TLS, self-signed)
+* And of course the helmetica framework
 
 To talk to the cluster, point `kubectl` at the generated kubeconfig:
 

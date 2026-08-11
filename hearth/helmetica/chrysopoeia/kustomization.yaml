@@ -1,0 +1,72 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: hel-chrysopoeia
+
+resources:
+  - github.com/helmetica-framework/chrysopoeia//config/crd?ref=v0.1.0-dev20
+  - github.com/helmetica-framework/chrysopoeia//config/default?ref=v0.1.0-dev20
+
+images:
+  # manager.yaml hardcodes :latest
+  - name: ghcr.io/helmetica-framework/chrysopoeia
+    newTag: v0.1.0-dev20
+
+patches:
+  - target:
+      kind: Deployment
+      name: chrysopoeia-controller-manager
+    patch: |
+      - op: test
+        path: /spec/template/spec/containers/0/name
+        value: manager
+      - op: add
+        path: /spec/template/spec/containers/0/args/-
+        value: --image-reflector-controller-hostname=image-reflector-controller-tags.hel-flux.svc:8090
+
+replacements:
+  - source:
+      kind: Service
+      version: v1
+      name: chrysopoeia-webhook-service
+      fieldPath: metadata.namespace
+    targets:
+      - select:
+          kind: Certificate
+          group: cert-manager.io
+          version: v1
+          name: chrysopoeia-serving-cert
+        fieldPaths:
+          - spec.dnsNames.0
+          - spec.dnsNames.1
+        options:
+          delimiter: '.'
+          index: 1
+
+  - source:
+      kind: Service
+      version: v1
+      name: chrysopoeia-controller-manager-metrics-service
+      fieldPath: metadata.namespace
+    targets:
+      - select:
+          kind: Certificate
+          group: cert-manager.io
+          version: v1
+          name: chrysopoeia-metrics-certs
+        fieldPaths:
+          - spec.dnsNames.0
+          - spec.dnsNames.1
+        options:
+          delimiter: '.'
+          index: 1
+      - select:
+          kind: ServiceMonitor
+          group: monitoring.coreos.com
+          version: v1
+          name: chrysopoeia-controller-manager-metrics-monitor
+        fieldPaths:
+          - spec.endpoints.0.tlsConfig.serverName
+        options:
+          delimiter: '.'
+          index: 1
