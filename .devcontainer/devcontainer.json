@@ -29,7 +29,7 @@
     "vscode": {
       "extensions": [
         "golang.go",
-        "ms-vscode.makefile-tools",
+        "nefrob.vscode-just-syntax",
         "redhat.vscode-yaml",
         "timonwong.shellcheck",
         "eamodio.gitlens",

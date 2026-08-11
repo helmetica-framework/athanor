@@ -16,7 +16,7 @@ It provides a local [kind](https://kind.sigs.k8s.io/) cluster with all modules n
 
 1. Clone this repository and open it in VS Code.
 2. When prompted, choose **Reopen in Container**. Alternatively open the command palette (`F1`) and run **Dev Containers: Reopen in Container**.
-3. Wait for the container to build and provision. The `postCreateCommand` automatically runs `make ignite`, so once provisioning finishes you already have a running cluster.
+3. Wait for the container to build and provision. The `postCreateCommand` automatically runs `just ignite`, so once provisioning finishes you already have a running cluster.
 
 Another good way to run the devcontainer is [DevPod](https://github.com/skevetter/devpod) (community-maintained fork).
 It works with any IDE and can run the devcontainer on your local Docker daemon or on remote providers:
@@ -36,7 +36,7 @@ devcontainer exec --workspace-folder . zsh
 
 The devcontainer ships all tooling needed for development:
 
-* Go, `make`, `git`, `vim`
+* Go, `just`, `git`, `vim`
 * `docker` (docker-in-docker)
 * `kubectl` (with completions and [kubecolor](https://github.com/kubecolor/kubecolor)), `helm`, `krew`
 * `jq` and `yq`
@@ -56,7 +56,7 @@ The devcontainer forwards the following ports to your host:
 If you need to (re-)create the cluster manually, simply ignite the furnace to get a kind cluster with all necessary modules:
 
 ```bash
-make ignite
+just ignite
 ```
 
 This creates the kind cluster and installs the modules from the `hearth/` folder:
@@ -79,8 +79,7 @@ Some handy URLs once the furnace is lit:
 * <http://prometheus.127.0.0.1.nip.io:8088>
 * <http://alertmanager.127.0.0.1.nip.io:8088>
 
-The modules are tracked with sentinel files in `.kind/`.
-Editing a module's values file (e.g. `hearth/traefik/values.yaml`) and re-running `make ignite` upgrades just that module.
+Editing a module's values file (e.g. `hearth/traefik/values.yaml`) and re-running `just ignite` reconciles every module, or run the single recipe (e.g. `just traefik-setup`) to upgrade only that one.
 
 Then put the service charts (reagents) into the `reagents/` folder and develop away.
 
@@ -89,10 +88,10 @@ Then put the service charts (reagents) into the `reagents/` folder and develop a
 To stop and delete the cluster:
 
 ```bash
-make quench
+just quench
 ```
 
-`make help` lists all available targets.
+`just` (or `just --list`) lists all available recipes.
 
 ## Structure
 
@@ -100,8 +99,8 @@ make quench
 .
 ├── hearth            # Modules for athanor (one folder per module)
 ├── reagents          # Charts to be developed go here
-├── Makefile          # Contains logic to start/stop the devenv
-├── Makefile.vars.mk  # Pinned versions of all modules (managed by Renovate)
+├── Justfile             # Contains logic to start/stop the devenv
+├── Justfile.vars.just   # Pinned versions of all modules (managed by Renovate)
 ├── README.md
 └── renovate.json
 ```
