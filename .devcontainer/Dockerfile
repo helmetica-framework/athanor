@@ -5,7 +5,7 @@ ARG TARGETARCH
 
 ENV KUBECOLORVERSION="0.4.0"
 # renovate: datasource=github-releases depName=casey/just
-ENV JUSTVERSION="1.51.0"
+ENV JUSTVERSION="1.58.0"
 # renovate: datasource=github-releases depName=kubernetes-sigs/krew
 ENV KREWVERSION="0.5.0"
 
