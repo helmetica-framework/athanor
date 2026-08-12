@@ -4,9 +4,9 @@
 # Except devcontainer
 !.devcontainer/
 !.gitignore
-!Makefile
 !README.md
 !renovate.json
 !hearth
-!Makefile.vars.mk
 !.github
+!Justfile
+!Justfile.vars.just

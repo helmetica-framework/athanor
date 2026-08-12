@@ -12,13 +12,25 @@
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Update versions in Makefiles annotated with a `# renovate:` comment",
+      "description": "Update versions in Justfiles annotated with a `# renovate:` comment",
       "managerFilePatterns": [
-        "/(^|/)Makefile$/",
-        "/\\.mk$/"
+        "/(^|/)Justfile$/",
+        "/\\.just$/"
       ],
       "matchStrings": [
-        "# renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)(?: registryUrl=(?<registryUrl>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?\\n[A-Z0-9_]+ \\?= (?<currentValue>[^\\s]+)"
+        "# renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)(?: registryUrl=(?<registryUrl>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?\\n[A-Z0-9_]+ := \"(?<currentValue>[^\"]+)\""
+      ]
+    },
+    {
+      "customType": "regex",
+      "description": "Update the just version used to bootstrap the devcontainer and CI",
+      "managerFilePatterns": [
+        "/(^|/)Dockerfile$/",
+        "/^\\.github/workflows/.+\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)\\nENV [A-Z0-9_]+=\"(?<currentValue>[^\"]+)\"",
+        "# renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)\\n\\s*just-version: '(?<currentValue>[^']+)'"
       ]
     }
   ]
