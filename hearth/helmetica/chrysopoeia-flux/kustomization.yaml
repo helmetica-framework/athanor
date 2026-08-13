@@ -10,3 +10,29 @@ namespace: hel-flux
 resources:
   # Chryso brings its own flux
   - github.com/helmetica-framework/chrysopoeia//config/flux?ref=v0.1.0-dev20
+
+# Inject ca certs for devenv
+patches:
+  - target:
+      kind: Deployment
+    patch: |
+      - op: test
+        path: /spec/template/spec/containers/0/name
+        value: manager
+      - op: add
+        path: /spec/template/spec/volumes/-
+        value:
+          name: trust-bundle
+          configMap:
+            name: athanor-trust-bundle
+      - op: add
+        path: /spec/template/spec/containers/0/volumeMounts/-
+        value:
+          name: trust-bundle
+          mountPath: /etc/trust
+          readOnly: true
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SSL_CERT_FILE
+          value: /etc/trust/ca-certificates.crt
