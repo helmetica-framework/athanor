@@ -4,10 +4,13 @@ _default:
     @just --list
 
 # Start up athanor
-ignite: kind-setup metallb-setup traefik-setup prometheus-setup k8up-setup certmanager-setup registry-setup
+ignite: digest helmetica-setup
 
 # Stop and delete all docker containers of athanor
 quench: kind-clean
+
+# Provision cluster without helmetica. Derived from digestio: holding something at a low warmth
+digest: kind-setup metallb-setup traefik-setup prometheus-setup k8up-setup certmanager-setup registry-setup
 
 # Create the kind cluster
 kind-setup $KUBECONFIG=kind_kubeconfig:
@@ -106,3 +109,24 @@ registry-setup $KUBECONFIG=kind_kubeconfig: certmanager-setup
     kubectl apply -f hearth/registry/registry.yaml
     kubectl -n kube-system wait --for condition=Ready certificate/registry-cert --timeout 120s
     kubectl -n kube-system wait --for condition=Available deployment/registry --timeout 120s
+
+# Publish the registry CA plus the host's public roots as a trust bundle for flux
+trustbundle-setup $KUBECONFIG=kind_kubeconfig: registry-setup
+    #!/usr/bin/env bash
+    set -euo pipefail
+    bundle=$(mktemp)
+    trap 'rm -f "$bundle"' EXIT
+    cat /etc/ssl/certs/ca-certificates.crt > "$bundle"
+    kubectl create ns hel-flux
+    kubectl -n kube-system get secret tls-server-certificate -o jsonpath='{.data.ca\.crt}' | base64 -d >> "$bundle"
+    kubectl -n hel-flux create configmap athanor-trust-bundle \
+        --from-file=ca-certificates.crt="$bundle" \
+        --dry-run=client -o yaml | kubectl apply -f -
+
+# Install the helmetica operators (adept, chrysopoeia) into kind
+helmetica-setup $KUBECONFIG=kind_kubeconfig: certmanager-setup prometheus-setup registry-setup trustbundle-setup
+    {{ KUSTOMIZE_CMD }} build hearth/helmetica | kubectl apply --server-side -f -
+    # Namespaces are set in hearth/helmetica/*/kustomization.yaml; keep these in sync.
+    kubectl -n hel-flux wait --for condition=Available deployment --all --timeout 180s
+    kubectl -n hel-adept wait --for condition=Available deployment/adept-controller-manager --timeout 120s
+    kubectl -n hel-chrysopoeia wait --for condition=Available deployment/chrysopoeia-controller-manager --timeout 120s

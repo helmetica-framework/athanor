@@ -18,11 +18,11 @@ It provides a local [kind](https://kind.sigs.k8s.io/) cluster with all modules n
 2. When prompted, choose **Reopen in Container**. Alternatively open the command palette (`F1`) and run **Dev Containers: Reopen in Container**.
 3. Wait for the container to build and provision. The `postCreateCommand` automatically runs `just ignite`, so once provisioning finishes you already have a running cluster.
 
-Another good way to run the devcontainer is [DevPod](https://github.com/skevetter/devpod) (community-maintained fork).
+Another good way to run the devcontainer is [Devsy](https://github.com/devsy-org/devsy).
 It works with any IDE and can run the devcontainer on your local Docker daemon or on remote providers:
 
 ```bash
-devpod up .
+devsy up .
 ```
 
 If you prefer the plain CLI, the [devcontainer CLI](https://github.com/devcontainers/cli) works too:
@@ -56,6 +56,7 @@ The devcontainer forwards the following ports to your host:
 If you need to (re-)create the cluster manually, simply ignite the furnace to get a kind cluster with all necessary modules:
 
 ```bash
+just quench
 just ignite
 ```
 
@@ -67,8 +68,9 @@ This creates the kind cluster and installs the modules from the `hearth/` folder
 * [k8up](https://k8up.io/) for backups
 * [cert-manager](https://cert-manager.io/) for certificates
 * An internal container registry on `localhost:5000` (TLS, self-signed)
+* And of course the helmetica framework
 
-To talk to the cluster, point `kubectl` at the generated kubeconfig:
+To talk to the cluster from outside the devcontainer, point `kubectl` at the generated kubeconfig:
 
 ```bash
 export KUBECONFIG=$(pwd)/.kind/kind-config

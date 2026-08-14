@@ -20,6 +20,11 @@ RUN apt-get update && apt-get install bash-completion vim -y && rm -rf /var/lib/
 
 # Install krew as the user that runs the container, it installs into $HOME/.krew
 USER vscode
+
+# Install transmuter
+# Needs to run under the vscode user or will kill permissions later
+RUN go install github.com/helmetica-framework/transmuter@latest
+
 RUN curl -L -o krew.tar.gz https://github.com/kubernetes-sigs/krew/releases/download/v${KREWVERSION}/krew-linux_${TARGETARCH}.tar.gz && tar -xzf krew.tar.gz && ./krew-linux_${TARGETARCH} install krew && rm -rf krew.tar.gz krew-linux_${TARGETARCH} LICENSE
 ENV PATH="/home/vscode/.krew/bin:${PATH}"
 USER root
