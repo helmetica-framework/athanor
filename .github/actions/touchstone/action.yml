@@ -1,0 +1,65 @@
+name: touchstone
+description: >-
+  Read a reagent's purity in CI: ignite a throwaway athanor beside the caller's
+  checkout, run the reagent's touchstone against it and dump the cluster state
+  when it fails. The caller only has to check its own chart out first.
+
+inputs:
+  ref:
+    description: The athanor ref to ignite.
+    required: false
+    default: main
+  path:
+    description: Directory the athanor checkout lands in, relative to the workspace.
+    required: false
+    default: athanor
+  token:
+    description: >-
+      Token used to check athanor out. The default only reaches a public
+      athanor; pass a token with read access to it otherwise.
+    required: false
+    default: ${{ github.token }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      with:
+        repository: helmetica-framework/athanor
+        ref: ${{ inputs.ref }}
+        path: ${{ inputs.path }}
+        token: ${{ inputs.token }}
+
+    - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+      with:
+        go-version: stable
+        # kind, kustomize and chainsaw are `go run` one-offs, and the caller is
+        # a chart repository without a go.sum to key a cache on.
+        cache: false
+
+    - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
+      with:
+        # renovate: datasource=github-releases depName=casey/just
+        just-version: '1.58.0'
+
+    - uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5
+
+    - name: Ignite athanor
+      shell: bash
+      working-directory: ${{ inputs.path }}
+      run: just ignite
+
+    - name: Read the reagent's purity
+      shell: bash
+      env:
+        KUBECONFIG: ${{ github.workspace }}/${{ inputs.path }}/.kind/kind-config
+      run: just touchstone
+
+    - name: Dump cluster state on failure
+      if: failure()
+      shell: bash
+      env:
+        KUBECONFIG: ${{ github.workspace }}/${{ inputs.path }}/.kind/kind-config
+      run: |
+        kubectl get pods -A -o wide || true
+        kubectl get events -A --sort-by=.lastTimestamp | tail -50 || true
