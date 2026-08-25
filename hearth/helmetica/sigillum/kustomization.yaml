@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: hel-sigillum
+
+resources:
+  - github.com/helmetica-framework/sigillum//config/crd?ref=v0.0.1
+  - github.com/helmetica-framework/sigillum//config/default?ref=v0.0.1
+
+images:
+  # manager.yaml hardcodes :latest
+  - name: ghcr.io/helmetica-framework/sigillum
+    newTag: v0.0.1

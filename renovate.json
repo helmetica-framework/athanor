@@ -9,6 +9,16 @@
       "/^hearth/.+\\.ya?ml$/"
     ]
   },
+  "packageRules": [
+    {
+      "description": "Helmetica dev tags are sorted numerically. Semver would read v0.1.0-dev9 as newer than v0.1.0-dev21. Grouping keeps the crd/default refs and the image tag of a component on the same version.",
+      "matchFileNames": [
+        "hearth/helmetica/**"
+      ],
+      "groupName": "helmetica",
+      "versioning": "loose"
+    }
+  ],
   "customManagers": [
     {
       "customType": "regex",

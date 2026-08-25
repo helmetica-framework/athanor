@@ -4,10 +4,10 @@ kind: Kustomization
 namespace: hel-adept
 
 resources:
-  - github.com/helmetica-framework/adept//config/crd?ref=v0.0.1-dev1
-  - github.com/helmetica-framework/adept//config/default?ref=v0.0.1-dev1
+  - github.com/helmetica-framework/adept//config/crd?ref=v0.0.1-dev4
+  - github.com/helmetica-framework/adept//config/default?ref=v0.0.1-dev4
 
 images:
   # manager.yaml hardcodes :latest
   - name: ghcr.io/helmetica-framework/adept
-    newTag: v0.0.1-dev1
+    newTag: v0.0.1-dev4
