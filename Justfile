@@ -6,7 +6,7 @@ _default:
 # Start up athanor
 ignite: digest helmetica-setup
 
-# Stop and delete all docker containers of athanor
+# Stop and delete all containers of athanor
 quench: kind-clean
 
 # Provision cluster without helmetica. Derived from digestio: holding something at a low warmth
@@ -49,8 +49,11 @@ metallb-setup $KUBECONFIG=kind_kubeconfig:
     echo "Waiting for metallb webhook to become ready..."
     # The controller pod turns Ready before its webhook server listens (it waits
     # for cert rotation first), so retry the apply until the webhook answers.
-    HOSTIP=$(docker inspect {{ DOCKER_CONTAINER }} | jq -r '.[0].NetworkSettings.Networks["{{ DOCKER_NETWORK }}"].Gateway')
-    export range="${HOSTIP}00-${HOSTIP}50"
+    # Derive a LoadBalancer address range from the control-plane node's IP so it
+    # lives on the same subnet as the nodes, regardless of which runtime kind
+    # used (docker, podman, nerdctl, ...).
+    HOSTIP=$(kubectl get node {{ KIND_CLUSTER }}-control-plane -o jsonpath='{.status.addresses[?(@.type=="InternalIP")].address}')
+    export range="${HOSTIP%.*}.100-${HOSTIP%.*}.150"
     ok=0
     for i in $(seq 1 30); do
     	if yq 'select(document_index == 0) | .spec.addresses = [strenv(range)]' hearth/metallb/config.yaml | kubectl apply -f -; then ok=1; break; fi

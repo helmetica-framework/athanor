@@ -22,7 +22,7 @@ Another good way to run the devcontainer is [Devsy](https://github.com/devsy-org
 It works with any IDE and can run the devcontainer on your local Docker daemon or on remote providers:
 
 ```bash
-devsy up .
+devsy workspace up .
 ```
 
 If you prefer the plain CLI, the [devcontainer CLI](https://github.com/devcontainers/cli) works too:
@@ -50,6 +50,33 @@ The devcontainer forwards the following ports to your host:
 | 8443  | Ingress HTTPS (traefik)              |
 | 5000  | Internal container registry (TLS)    |
 | 36377 | Kubernetes API server                |
+
+## Running natively (without the devcontainer)
+
+The devcontainer exists to give you a standardized environment with working Metallb routing. Only use this if the devcontainer setup can't be used.
+
+This is the recommended path on hosts that only have **rootless Podman**, where nesting a docker-in-docker devcontainer is painful.
+Be sure to check ([kind's rootless docs](https://kind.sigs.k8s.io/docs/user/rootless/)) before continuing.
+
+### Host tooling
+
+`go`, `just`, `git`, `kubectl`, `helm`, `jq`, `yq`. `kind` and `kustomize` are fetched at pinned versions via `go run`, so they do not need to be installed.
+
+### Igniting natively
+
+kind autodetects the container engine it runs on (docker, podman, or nerdctl):
+
+```bash
+export KUBECONFIG=$(pwd)/.kind/kind-config
+just ignite
+```
+
+### Known limitation: LoadBalancer IPs under rootless container engines
+
+Running any container engine rootless (Podman, rootless containerd/nerdctl, or rootless Docker) puts the container network inside a user network namespace, so the host has no route to the MetalLB address pool. MetalLB still assigns IPs and works *inside* the cluster, but `curl <EXTERNAL-IP>` from the host fails with "no route to host" ([kind#3388](https://github.com/kubernetes-sigs/kind/issues/3388)).
+The same applies to MacOS, because there containers run in a VM.
+
+Ingress is unaffected — Traefik uses host ports via the cluster's `extraPortMappings`, so `localhost:8088`/`localhost:8443` work as usual. For a `LoadBalancer` service, use `kubectl port-forward` instead.
 
 ## Igniting the furnace
 
