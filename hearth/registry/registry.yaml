@@ -37,6 +37,11 @@ spec:
               value: /etc/cert/tls.crt
             - name: REGISTRY_HTTP_TLS_KEY
               value: /etc/cert/tls.key
+            # Off by default, and without it a DELETE is answered with 405 UNSUPPORTED.
+            # A reagent pushed here is meant to be thrown away again (`just evaporate`),
+            # and the storage is an emptyDir anyway.
+            - name: REGISTRY_STORAGE_DELETE_ENABLED
+              value: "true"
           volumeMounts:
             - name: registry-storage
               mountPath: /var/lib/registry

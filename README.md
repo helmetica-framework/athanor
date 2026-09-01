@@ -67,6 +67,10 @@ This creates the kind cluster and installs the modules from the `hearth/` folder
 * [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) for monitoring
 * [k8up](https://k8up.io/) for backups
 * [cert-manager](https://cert-manager.io/) for certificates
+* [COSI](https://container-object-storage-interface.sigs.k8s.io/) (the `objectstorage.k8s.io`
+  CRDs and its central controller) so a `BucketClaim` provisions a real bucket
+* The [garage operator](https://github.com/rajsinghtech/garage-operator) with its COSI
+  driver enabled, plus a single-node [Garage](https://garagehq.deuxfleurs.fr/) cluster
 * An internal container registry on `localhost:5000` (TLS, self-signed)
 * And of course the helmetica framework
 
@@ -74,6 +78,28 @@ To talk to the cluster from outside the devcontainer, point `kubectl` at the gen
 
 ```bash
 export KUBECONFIG=$(pwd)/.kind/kind-config
+```
+
+### Asking for a bucket
+
+The `garage` `BucketClass` and `BucketAccessClass` are installed and pointed at the local
+Garage cluster, so a claim is all it takes:
+
+```yaml
+apiVersion: objectstorage.k8s.io/v1alpha2
+kind: BucketClaim
+metadata:
+  name: scratch
+  namespace: default
+spec:
+  bucketClassName: garage
+  protocols:
+  - S3
+```
+
+```console
+kubectl get bucketclaims,buckets
+kubectl -n garage-system logs deployment/garage-operator -f
 ```
 
 Some handy URLs once the furnace is lit:

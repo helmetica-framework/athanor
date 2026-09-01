@@ -1,0 +1,31 @@
+# The classes a BucketClaim asks for. Point a driver's consumers at `garage` and their
+# buckets are provisioned in the local Garage cluster.
+apiVersion: objectstorage.k8s.io/v1alpha2
+kind: BucketClass
+metadata:
+  name: garage
+spec:
+  driverName: garage.rajsingh.info
+  # Delete: a bucket goes away with its claim, and so do the backups in it. This is a
+  # scratch cluster, where leaving buckets behind only makes `just quench` less complete.
+  #
+  # Garage's admin API refuses to delete a bucket that still holds objects, and its operator
+  # will not purge one for you - so this policy only works because ampulla empties the bucket
+  # itself before releasing the claim to COSI. A driver-provisioned bucket claimed by
+  # anything else still needs emptying by hand.
+  deletionPolicy: Delete
+  parameters:
+    clusterRef: garage
+    clusterNamespace: garage-system
+---
+apiVersion: objectstorage.k8s.io/v1alpha2
+kind: BucketAccessClass
+metadata:
+  name: garage
+spec:
+  driverName: garage.rajsingh.info
+  # Key is the only type Garage supports: it has no IAM.
+  authenticationType: Key
+  parameters:
+    clusterRef: garage
+    clusterNamespace: garage-system

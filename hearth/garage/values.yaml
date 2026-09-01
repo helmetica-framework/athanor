@@ -1,0 +1,18 @@
+# The COSI driver is the whole reason garage is in athanor: it turns a BucketClaim into
+# a real bucket in the local Garage cluster, so the backup path can be exercised without
+# talking to a cloud provider.
+cosi:
+  enabled: true
+  # Must match the driverName of the BucketClass and BucketAccessClass in cosi.yaml.
+  driverName: garage.rajsingh.info
+
+# athanor runs kube-prometheus-stack, so let the operator be scraped like every other
+# module here.
+serviceMonitor:
+  enabled: true
+
+# The webhooks need cert-manager, which athanor installs before this module.
+webhooks:
+  enabled: true
+  certManager:
+    enabled: true

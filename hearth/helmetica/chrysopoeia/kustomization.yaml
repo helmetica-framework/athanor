@@ -9,6 +9,12 @@ resources:
 
 images:
   # manager.yaml hardcodes :latest
+  #
+  # When working on chrysopoeia itself, build the image, `kind load` it into the cluster and
+  # set this to `dev` rather than reaching for `kubectl set image`: a manual set makes
+  # `kubectl-set` the owner of the image field, and the next `just helmetica-setup` then
+  # fails with a server-side-apply conflict. Do not commit that tag, it does not exist in
+  # the registry.
   - name: ghcr.io/helmetica-framework/chrysopoeia
     newTag: v0.1.0-dev20
 
@@ -23,6 +29,17 @@ patches:
       - op: add
         path: /spec/template/spec/containers/0/args/-
         value: --image-reflector-controller-hostname=image-reflector-controller-tags.hel-flux.svc:8090
+      # The harness proxy runs in hel-chrysopoeia-proxy here, not in the upstream
+      # chrysopoeia-proxy-system these two flags default to. Keep them in step with
+      # `namespace:` in hearth/helmetica/chrysopoeia-proxy/kustomization.yaml: the first is
+      # what harnessed operator pods are pointed at, the second is where the controller reads
+      # the proxy's CA from - and it scopes its whole Secret cache to that namespace.
+      - op: add
+        path: /spec/template/spec/containers/0/args/-
+        value: --harness-proxy-host=chrysopoeia-proxy.hel-chrysopoeia-proxy.svc
+      - op: add
+        path: /spec/template/spec/containers/0/args/-
+        value: --harness-proxy-ca-secret-namespace=hel-chrysopoeia-proxy
 
 replacements:
   - source:

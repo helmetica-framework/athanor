@@ -1,0 +1,68 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: hel-ampulla
+
+resources:
+  # config/default already pulls in config/crd; listing both duplicates the CRD.
+  - github.com/helmetica-framework/ampulla//config/default?ref=v0.0.1
+
+images:
+  # manager.yaml hardcodes :latest
+  - name: ghcr.io/helmetica-framework/ampulla
+    newTag: v0.0.1
+
+patches:
+  - target:
+      kind: Deployment
+      name: ampulla-controller-manager
+    patch: |
+      - op: test
+        path: /spec/template/spec/containers/0/name
+        value: manager
+      # The base deliberately names no classes: which object storage a customer's data ends
+      # up in is not a decision to default in a base everyone deploys from. Here it is,
+      # because the garage module installs exactly these two (hearth/garage/cosi.yaml), so a
+      # BackupPolicy only has to exist to get a bucket.
+      - op: add
+        path: /spec/template/spec/containers/0/args/-
+        value: --default-bucket-class=garage
+      - op: add
+        path: /spec/template/spec/containers/0/args/-
+        value: --default-bucket-access-class=garage
+
+# The base builds the metrics certificate's SANs and the ServiceMonitor's serverName from
+# its own namespace, and `namespace:` above only rewrites metadata, not the strings inside
+# them. Without this prometheus would verify a certificate for a name the service no longer
+# answers to and the scrape would fail.
+#
+# The base's replacement is index-based, so running it again here replaces the namespace
+# segment of the name the base already built.
+replacements:
+  - source:
+      kind: Service
+      version: v1
+      name: ampulla-controller-manager-metrics-service
+      fieldPath: metadata.namespace
+    targets:
+      - select:
+          kind: Certificate
+          group: cert-manager.io
+          version: v1
+          name: ampulla-metrics-certs
+        fieldPaths:
+          - spec.dnsNames.0
+          - spec.dnsNames.1
+        options:
+          delimiter: '.'
+          index: 1
+      - select:
+          kind: ServiceMonitor
+          group: monitoring.coreos.com
+          version: v1
+          name: ampulla-controller-manager-metrics-monitor
+        fieldPaths:
+          - spec.endpoints.0.tlsConfig.serverName
+        options:
+          delimiter: '.'
+          index: 1
