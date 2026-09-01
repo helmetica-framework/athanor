@@ -1,0 +1,39 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: hel-chrysopoeia-proxy
+
+resources:
+  - github.com/helmetica-framework/chrysopoeia//config/proxy?ref=v0.1.0-dev20
+
+images:
+  # The base pins an older tag than the controller runs; keep the two in step, they are the
+  # same binary with a different subcommand.
+  - name: ghcr.io/helmetica-framework/chrysopoeia
+    newTag: v0.1.0-dev20
+
+# The base builds the serving certificate's SANs from its own namespace, and `namespace:`
+# above only rewrites metadata, not the strings inside the certificate. Without this the
+# proxy would serve a certificate for a name it no longer answers to, and every harnessed
+# operator would fail to verify it.
+#
+# The base's replacement is index-based, so running it again here replaces the namespace
+# segment of the name the base already built.
+replacements:
+  - source:
+      kind: Service
+      version: v1
+      name: chrysopoeia-proxy
+      fieldPath: metadata.namespace
+    targets:
+      - select:
+          kind: Certificate
+          group: cert-manager.io
+          version: v1
+          name: chrysopoeia-proxy-serving-cert
+        fieldPaths:
+          - spec.dnsNames.0
+          - spec.dnsNames.1
+        options:
+          delimiter: '.'
+          index: 1

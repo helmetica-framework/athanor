@@ -1,0 +1,40 @@
+# A single-node Garage cluster: the S3 backend the COSI driver provisions buckets in.
+#
+# One replica with replication factor 1 is the smallest thing Garage will run, which is
+# what a laptop-sized kind cluster wants. Nothing here is meant to survive `just quench`.
+apiVersion: garage.rajsingh.info/v1beta2
+kind: GarageCluster
+metadata:
+  name: garage
+  namespace: garage-system
+spec:
+  replication:
+    factor: 1
+    consistencyMode: consistent
+
+  storage:
+    replicas: 1
+    metadata:
+      size: 1Gi
+    data:
+      size: 5Gi
+
+  network:
+    rpcBindPort: 3901
+    service:
+      type: ClusterIP
+
+  s3Api:
+    bindPort: 3900
+    region: garage
+
+  admin:
+    bindPort: 3903
+    # Created by `just garage-setup`, once, with a random token: the operator needs it to
+    # drive Garage's admin API, and so does the COSI driver.
+    adminTokenSecretRef:
+      name: garage-admin-token
+      key: admin-token
+
+  database:
+    engine: lmdb

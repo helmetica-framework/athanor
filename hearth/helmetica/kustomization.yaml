@@ -4,5 +4,9 @@ kind: Kustomization
 resources:
   - adept
   - chrysopoeia
+  # Harnessed operators reach the API server through this proxy, not directly: without it
+  # their pods are pointed at a Service that does not exist and never start.
+  - chrysopoeia-proxy
   - chrysopoeia-flux
   - sigillum
+  - ampulla
