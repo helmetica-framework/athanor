@@ -1,0 +1,36 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: hel-custos
+
+resources:
+  # config/default deliberately leaves the CRDs out, so both are listed here.
+  - github.com/helmetica-framework/custos//config/crd?ref=v0.0.2
+  - github.com/helmetica-framework/custos//config/default?ref=v0.0.2
+
+images:
+  # manager.yaml hardcodes :latest
+  - name: ghcr.io/helmetica-framework/custos
+    newTag: v0.0.2
+
+patches:
+  - target:
+      kind: Deployment
+      name: custos-controller-manager
+    patch: |
+      - op: test
+        path: /spec/template/spec/containers/0/name
+        value: manager
+      # The gather Job runs the same custos image as the controller, but as a flag value the
+      # `images:` transformer above cannot reach it: it only rewrites container image fields.
+      # Left alone, every gather Job would pull :latest while the controller runs v0.0.1.
+      #
+      # The index is where the base leaves the flag once config/default has inserted
+      # --metrics-bind-address at 1; the test above it fails the build if that ever moves.
+      - op: test
+        path: /spec/template/spec/containers/0/args/3
+        value: --gather-image=ghcr.io/helmetica-framework/custos:latest
+      # renovate: datasource=docker depName=ghcr.io/helmetica-framework/custos
+      - op: replace
+        path: /spec/template/spec/containers/0/args/3
+        value: --gather-image=ghcr.io/helmetica-framework/custos:v0.0.2

@@ -42,6 +42,16 @@
         "# renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)\\nENV [A-Z0-9_]+=\"(?<currentValue>[^\"]+)\"",
         "# renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)\\n\\s*just-version: '(?<currentValue>[^']+)'"
       ]
+    },
+    {
+      "customType": "regex",
+      "description": "custos passes its own image to the gather Job as a flag. It sits inside a kustomize patch, where neither the kustomize nor the kubernetes manager looks, so without this it would keep pointing at the previous release after a bump. hearth/helmetica/** puts it in the helmetica group with the component's other refs.",
+      "managerFilePatterns": [
+        "/^hearth/helmetica/.+/kustomization\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)\\n\\s+- op: replace\\n\\s+path: [^\\n]+\\n\\s+value: --gather-image=[^\\s:]+:(?<currentValue>[^\\s]+)"
+      ]
     }
   ]
 }
