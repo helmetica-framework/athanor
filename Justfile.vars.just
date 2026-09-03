@@ -3,7 +3,7 @@ go_bin := justfile_directory() / ".work" / "bin"
 
 # Kind
 # renovate: datasource=docker depName=kindest/node
-KIND_NODE_VERSION := "v1.36.1"
+KIND_NODE_VERSION := "v1.37.0"
 # renovate: datasource=github-releases depName=kubernetes-sigs/kind
 KIND_VERSION := "v0.33.0"
 KIND_IMAGE := "docker.io/kindest/node:" + KIND_NODE_VERSION
