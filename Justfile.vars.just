@@ -5,7 +5,7 @@ go_bin := justfile_directory() / ".work" / "bin"
 # renovate: datasource=docker depName=kindest/node
 KIND_NODE_VERSION := "v1.36.1"
 # renovate: datasource=github-releases depName=kubernetes-sigs/kind
-KIND_VERSION := "v0.32.0"
+KIND_VERSION := "v0.33.0"
 KIND_IMAGE := "docker.io/kindest/node:" + KIND_NODE_VERSION
 KIND_CMD := "go run sigs.k8s.io/kind@" + KIND_VERSION
 # renovate: datasource=go depName=sigs.k8s.io/kustomize/kustomize/v5
