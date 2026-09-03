@@ -135,7 +135,15 @@ garage-setup $KUBECONFIG=kind_kubeconfig: certmanager-setup cosi-setup
     	kubectl -n garage-system create secret generic garage-admin-token \
     		--from-literal=admin-token="$(head -c 32 /dev/urandom | base64 | tr -d '=+/')"
     fi
-    kubectl apply --server-side -f hearth/garage/cluster.yaml
+
+    ok=0
+    for i in $(seq 1 30); do
+    	if kubectl apply -f hearth/garage/cluster.yaml; then ok=1; break; fi
+    	echo "garage webhook not ready yet, retrying ($i/30)..."
+    	sleep 3
+    done
+    [ $ok -eq 1 ]
+
     echo "Waiting for the Garage cluster to come up..."
     for i in $(seq 1 60); do
     	if kubectl -n garage-system get pod -l garage.rajsingh.info/cluster=garage 2>/dev/null | grep -q .; then break; fi
