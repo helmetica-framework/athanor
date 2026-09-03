@@ -11,12 +11,13 @@
   },
   "packageRules": [
     {
-      "description": "Helmetica dev tags are sorted numerically. Semver would read v0.1.0-dev9 as newer than v0.1.0-dev21. Grouping keeps the crd/default refs and the image tag of a component on the same version.",
+      "description": "Helmetica dev tags are sorted numerically. Semver would read v0.1.0-dev9 as newer than v0.1.0-dev21. Grouping keeps the crd/default refs and the image tag of a component on the same version. allowedVersions drops the per-arch tags the release workflow pushes next to each release: loose compares the part after the version numbers as a string, so v0.1.0-dev21-arm64 reads as newer than v0.1.0-dev21, and a bump to it would pin every node to one architecture.",
       "matchFileNames": [
         "hearth/helmetica/**"
       ],
       "groupName": "helmetica",
-      "versioning": "loose"
+      "versioning": "loose",
+      "allowedVersions": "/^v\\d+\\.\\d+\\.\\d+(-dev\\d+)?$/"
     }
   ],
   "customManagers": [
