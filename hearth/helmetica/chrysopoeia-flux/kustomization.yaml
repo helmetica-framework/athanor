@@ -9,7 +9,7 @@ namespace: hel-flux
 
 resources:
   # Chryso brings its own flux
-  - github.com/helmetica-framework/chrysopoeia//config/flux?ref=v0.1.0-dev20
+  - github.com/helmetica-framework/chrysopoeia//config/flux?ref=v0.1.0-dev21
 
 # Inject ca certs for devenv
 patches:

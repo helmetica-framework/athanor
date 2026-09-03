@@ -4,13 +4,13 @@ kind: Kustomization
 namespace: hel-chrysopoeia-proxy
 
 resources:
-  - github.com/helmetica-framework/chrysopoeia//config/proxy?ref=v0.1.0-dev20
+  - github.com/helmetica-framework/chrysopoeia//config/proxy?ref=v0.1.0-dev21
 
 images:
   # The base pins an older tag than the controller runs; keep the two in step, they are the
   # same binary with a different subcommand.
   - name: ghcr.io/helmetica-framework/chrysopoeia
-    newTag: v0.1.0-dev20
+    newTag: v0.1.0-dev21
 
 # The base builds the serving certificate's SANs from its own namespace, and `namespace:`
 # above only rewrites metadata, not the strings inside the certificate. Without this the

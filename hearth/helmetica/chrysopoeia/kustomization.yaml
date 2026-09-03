@@ -4,8 +4,8 @@ kind: Kustomization
 namespace: hel-chrysopoeia
 
 resources:
-  - github.com/helmetica-framework/chrysopoeia//config/crd?ref=v0.1.0-dev20
-  - github.com/helmetica-framework/chrysopoeia//config/default?ref=v0.1.0-dev20
+  - github.com/helmetica-framework/chrysopoeia//config/crd?ref=v0.1.0-dev21
+  - github.com/helmetica-framework/chrysopoeia//config/default?ref=v0.1.0-dev21
 
 images:
   # manager.yaml hardcodes :latest
@@ -16,7 +16,7 @@ images:
   # fails with a server-side-apply conflict. Do not commit that tag, it does not exist in
   # the registry.
   - name: ghcr.io/helmetica-framework/chrysopoeia
-    newTag: v0.1.0-dev20
+    newTag: v0.1.0-dev21
 
 patches:
   - target:
