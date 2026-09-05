@@ -30,7 +30,7 @@ CERTMANAGER_VERSION := "v1.21.1"
 # renovate: datasource=github-releases depName=metallb/metallb
 METALLB_VERSION := "v0.16.0"
 # renovate: datasource=docker depName=ghcr.io/rajsinghtech/charts/garage-operator
-GARAGE_OPERATOR_CHART_VERSION := "0.7.7"
+GARAGE_OPERATOR_CHART_VERSION := "0.7.8"
 # The COSI API itself: CRDs and the central controller, neither of which is released as a
 # tag that carries the v1alpha2 API yet. Pinned to the revision the garage operator's COSI
 # client is built against (its go.mod), so bump it together with the chart above.
