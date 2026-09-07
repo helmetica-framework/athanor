@@ -4,8 +4,8 @@ kind: Kustomization
 namespace: hel-chrysopoeia
 
 resources:
-  - github.com/helmetica-framework/chrysopoeia//config/crd?ref=v0.1.0-dev21
-  - github.com/helmetica-framework/chrysopoeia//config/default?ref=v0.1.0-dev21
+  - github.com/helmetica-framework/chrysopoeia//config/crd?ref=v0.1.0-dev22
+  - github.com/helmetica-framework/chrysopoeia//config/default?ref=v0.1.0-dev22
 
 images:
   # manager.yaml hardcodes :latest
