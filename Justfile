@@ -151,6 +151,7 @@ garage-setup $KUBECONFIG=kind_kubeconfig: certmanager-setup cosi-setup
     done
     kubectl -n garage-system wait --for condition=Ready pod -l garage.rajsingh.info/cluster=garage --timeout 240s
     kubectl apply --server-side -f hearth/garage/cosi.yaml
+    kubectl apply --server-side -f hearth/garage/ingress.yaml
 
 # Install internal container registry (localhost:5000) into kind
 registry-setup $KUBECONFIG=kind_kubeconfig: certmanager-setup

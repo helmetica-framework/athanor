@@ -133,6 +133,7 @@ Some handy URLs once the furnace is lit:
 
 * <http://prometheus.127.0.0.1.nip.io:8088>
 * <http://alertmanager.127.0.0.1.nip.io:8088>
+* <http://s3.127.0.0.1.nip.io:8088>
 
 Editing a module's values file (e.g. `hearth/traefik/values.yaml`) and re-running `just ignite` reconciles every module, or run the single recipe (e.g. `just traefik-setup`) to upgrade only that one.
 
