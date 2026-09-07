@@ -16,7 +16,7 @@ images:
   # fails with a server-side-apply conflict. Do not commit that tag, it does not exist in
   # the registry.
   - name: ghcr.io/helmetica-framework/chrysopoeia
-    newTag: v0.1.0-dev21
+    newTag: v0.1.0-dev22
 
 patches:
   - target:
