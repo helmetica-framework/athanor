@@ -26,7 +26,7 @@ K8UP_CHART_VERSION := "4.10.0"
 # renovate: datasource=github-releases depName=k8up-io/k8up
 K8UP_CRD_VERSION := "v2.16.0"
 # renovate: datasource=github-releases depName=cert-manager/cert-manager
-CERTMANAGER_VERSION := "v1.21.1"
+CERTMANAGER_VERSION := "v1.21.2"
 # renovate: datasource=github-releases depName=metallb/metallb
 METALLB_VERSION := "v0.16.0"
 # renovate: datasource=docker depName=ghcr.io/rajsinghtech/charts/garage-operator
