@@ -46,8 +46,8 @@ The devcontainer forwards the following ports to your host:
 
 | Port  | Purpose                              |
 | ----- | ------------------------------------ |
-| 8088  | Ingress HTTP (traefik)               |
-| 8443  | Ingress HTTPS (traefik)              |
+| 8088  | Ingress HTTP (istio)                 |
+| 8443  | Ingress HTTPS (istio)                |
 | 5000  | Internal container registry (TLS)    |
 | 36377 | Kubernetes API server                |
 
@@ -76,7 +76,7 @@ just ignite
 Running any container engine rootless (Podman, rootless containerd/nerdctl, or rootless Docker) puts the container network inside a user network namespace, so the host has no route to the MetalLB address pool. MetalLB still assigns IPs and works *inside* the cluster, but `curl <EXTERNAL-IP>` from the host fails with "no route to host" ([kind#3388](https://github.com/kubernetes-sigs/kind/issues/3388)).
 The same applies to MacOS, because there containers run in a VM.
 
-Ingress is unaffected — Traefik uses host ports via the cluster's `extraPortMappings`, so `localhost:8088`/`localhost:8443` work as usual. For a `LoadBalancer` service, use `kubectl port-forward` instead.
+Ingress is unaffected — the istio ingress gateway uses node ports via the cluster's `extraPortMappings`, so `localhost:8088`/`localhost:8443` work as usual. For a `LoadBalancer` service, use `kubectl port-forward` instead.
 
 ## Igniting the furnace
 
@@ -89,7 +89,10 @@ just ignite
 
 This creates the kind cluster and installs the modules from the `hearth/` folder:
 
-* [traefik](https://traefik.io/) as ingress controller, reachable on `localhost:8088`/`localhost:8443`
+* [istio](https://istio.io/) as ingress controller, reachable on `localhost:8088`/`localhost:8443`,
+  and as `GatewayClass` `istio`. No sidecars: istiod only runs gateways.
+* The [Gateway API](https://gateway-api.sigs.k8s.io/) CRDs (experimental channel, for
+  `TCPRoute`)
 * [metallb](https://metallb.io/) so `LoadBalancer` services get IPs
 * [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) for monitoring
 * [k8up](https://k8up.io/) for backups

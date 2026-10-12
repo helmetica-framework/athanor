@@ -17,8 +17,11 @@ DOCKER_CONTAINER := "athanor-control-plane"
 DOCKER_NETWORK := "kind"
 
 # Module versions
-# renovate: datasource=helm depName=traefik registryUrl=https://traefik.github.io/charts
-TRAEFIK_CHART_VERSION := "41.7.1"
+# renovate: datasource=helm depName=istiod registryUrl=https://blob.istio.io/istio-release/charts
+ISTIO_VERSION := "1.31.1"
+# The experimental channel: Istio's TCP support needs UDPRoute, which standard lacks.
+# renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
+GATEWAY_API_VERSION := "v1.6.2"
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
 PROMETHEUS_CHART_VERSION := "92.3.0"
 # renovate: datasource=helm depName=k8up registryUrl=https://k8up-io.github.io/k8up

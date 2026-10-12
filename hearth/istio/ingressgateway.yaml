@@ -1,0 +1,28 @@
+# See https://github.com/istio/istio/tree/master/manifests/charts/gateway
+#
+# Serves the classic Ingress objects. istiod finds it by its name: meshConfig's
+# defaults expect a Service istio-ingressgateway and pods labelled
+# istio=ingressgateway, which the release name provides.
+
+autoscaling:
+  enabled: false
+
+# kind has no cloud LB for the host to reach, so the fixed node ports are mapped
+# to localhost:8088/8443 in hearth/kind/config.yaml.
+service:
+  type: NodePort
+  ports:
+    - name: status-port
+      port: 15021
+      protocol: TCP
+      targetPort: 15021
+    - name: http2
+      port: 80
+      protocol: TCP
+      targetPort: 80
+      nodePort: 31080
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: 443
+      nodePort: 31443

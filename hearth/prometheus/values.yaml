@@ -16,6 +16,8 @@ alertmanager:
     enabled: true
     hosts:
       - alertmanager.127.0.0.1.nip.io
+    # istio reads the chart's default, ImplementationSpecific, as an exact match.
+    pathType: Prefix
 
 prometheus:
   prometheusSpec:
@@ -28,6 +30,8 @@ prometheus:
     enabled: true
     hosts:
       - prometheus.127.0.0.1.nip.io
+    # istio reads the chart's default, ImplementationSpecific, as an exact match.
+    pathType: Prefix
 
 # See https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-state-metrics
 kube-state-metrics:

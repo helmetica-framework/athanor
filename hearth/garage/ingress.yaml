@@ -1,4 +1,4 @@
-# Reaches the Garage S3 API from the host, through traefik on localhost:8088.
+# Reaches the Garage S3 API from the host, through istio on localhost:8088.
 #
 # Nothing in the cluster needs this: ampulla and the COSI driver talk to svc/garage
 # directly. It is here so an `aws s3` or `mc` on the laptop can look at what the backup
@@ -9,7 +9,7 @@ metadata:
   name: garage-s3
   namespace: garage-system
 spec:
-  # No ingressClassName: traefik is the default class (hearth/traefik/values.yaml).
+  # No ingressClassName: istio is the default class (hearth/istio/ingressclass.yaml).
   rules:
     # nip.io resolves this to 127.0.0.1, the same trick the prometheus URLs use.
     - host: s3.127.0.0.1.nip.io
