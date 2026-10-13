@@ -9,7 +9,7 @@ KIND_VERSION := "v0.33.0"
 KIND_IMAGE := "docker.io/kindest/node:" + KIND_NODE_VERSION
 KIND_CMD := "go run sigs.k8s.io/kind@" + KIND_VERSION
 # renovate: datasource=go depName=sigs.k8s.io/kustomize/kustomize/v5
-KUSTOMIZE_VERSION := "v5.8.1"
+KUSTOMIZE_VERSION := "v5.8.3"
 KUSTOMIZE_CMD := "go run sigs.k8s.io/kustomize/kustomize/v5@" + KUSTOMIZE_VERSION
 kind_kubeconfig    := justfile_directory() / ".kind/kind-config"
 KIND_CLUSTER := "athanor"
