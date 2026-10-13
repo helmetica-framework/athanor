@@ -1,0 +1,10 @@
+# See https://github.com/istio/istio/tree/master/manifests/charts/istio-control/istio-discovery
+#
+# No namespace is labelled for sidecar injection: istiod only runs the gateways.
+
+pilot:
+  env:
+    # TCP listeners and TCPRoute are still behind this flag. It also makes
+    # istiod wait for UDPRoute v1alpha2, which only the experimental Gateway
+    # API channel ships.
+    PILOT_ENABLE_ALPHA_GATEWAY_API: "true"

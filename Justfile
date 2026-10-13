@@ -10,7 +10,7 @@ ignite: digest helmetica-setup
 quench: kind-clean
 
 # Provision cluster without helmetica. Derived from digestio: holding something at a low warmth
-digest: kind-setup metallb-setup traefik-setup prometheus-setup k8up-setup certmanager-setup cosi-setup garage-setup registry-setup
+digest: kind-setup metallb-setup istio-setup prometheus-setup k8up-setup certmanager-setup cosi-setup garage-setup registry-setup
 
 # Create the kind cluster
 kind-setup $KUBECONFIG=kind_kubeconfig:
@@ -82,17 +82,31 @@ prometheus-setup $KUBECONFIG=kind_kubeconfig:
         kube-prometheus-stack
     kubectl -n prometheus-system wait --for condition=Available deployment/kube-prometheus-kube-prome-operator --timeout 120s
 
-# Install traefik as ingress controller into kind
-traefik-setup $KUBECONFIG=kind_kubeconfig:
-    helm upgrade --install traefik \
-        --repo https://traefik.github.io/charts \
-        --version {{ TRAEFIK_CHART_VERSION }} \
+# Install istio as ingress controller and Gateway API implementation into kind
+istio-setup $KUBECONFIG=kind_kubeconfig:
+    kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/{{ GATEWAY_API_VERSION }}/experimental-install.yaml
+    helm upgrade --install istio-base \
+        --repo https://blob.istio.io/istio-release/charts \
+        --version {{ ISTIO_VERSION }} \
         --create-namespace \
-        --namespace traefik \
+        --namespace istio-system \
         --wait \
-        --values hearth/traefik/values.yaml \
-        traefik
-    kubectl -n traefik wait --for condition=Available deployment/traefik --timeout 120s
+        base
+    helm upgrade --install istiod \
+        --repo https://blob.istio.io/istio-release/charts \
+        --version {{ ISTIO_VERSION }} \
+        --namespace istio-system \
+        --wait \
+        --values hearth/istio/istiod.yaml \
+        istiod
+    helm upgrade --install istio-ingressgateway \
+        --repo https://blob.istio.io/istio-release/charts \
+        --version {{ ISTIO_VERSION }} \
+        --namespace istio-system \
+        --wait \
+        --values hearth/istio/ingressgateway.yaml \
+        gateway
+    kubectl apply -f hearth/istio/ingressclass.yaml
 
 # Install k8up into kind
 k8up-setup $KUBECONFIG=kind_kubeconfig:

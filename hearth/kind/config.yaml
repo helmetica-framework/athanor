@@ -12,17 +12,12 @@ containerdConfigPatches:
       endpoint = ["http://registry.kube-system.svc.cluster.local:5000"]
 nodes:
   - role: control-plane
-    kubeadmConfigPatches:
-      - |
-        kind: InitConfiguration
-        nodeRegistration:
-          kubeletExtraArgs:
-            node-labels: "ingress-ready=true"
+    # The istio-ingressgateway node ports, hearth/istio/ingressgateway.yaml.
     extraPortMappings:
-      - containerPort: 80
+      - containerPort: 31080
         hostPort: 8088
         protocol: TCP
-      - containerPort: 443
+      - containerPort: 31443
         hostPort: 8443
         protocol: TCP
       - containerPort: 5000
