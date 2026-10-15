@@ -22,8 +22,6 @@ ISTIO_VERSION := "1.31.1"
 # The experimental channel: Istio's TCP support needs UDPRoute, which standard lacks.
 # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
 GATEWAY_API_VERSION := "v1.6.2"
-# renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-PROMETHEUS_CHART_VERSION := "92.3.0"
 # renovate: datasource=helm depName=k8up registryUrl=https://k8up-io.github.io/k8up
 K8UP_CHART_VERSION := "4.10.0"
 # renovate: datasource=github-releases depName=k8up-io/k8up
@@ -39,5 +37,10 @@ GARAGE_OPERATOR_CHART_VERSION := "0.8.2"
 # client is built against (its go.mod), so bump it together with the chart above.
 COSI_REVISION := "cc544691e2ef7ddc2fba972d796ed3188ea46315"
 
-# PROMETHEUS
-PROM_VALUES := "hearth/prometheus/values.yaml"
+# Monitoring: applied from the helmetica-framework component's athanor golden files, so
+# athanor runs the same operator, Prometheus and Alertmanager as production.
+# TODO: Use tags and renovate once available
+HELMETICA_FRAMEWORK_COMPONENT_REF := "master"
+HELMETICA_FRAMEWORK_COMPONENT_REPO := "https://github.com/vshn/component-helmetica-framework.git"
+monitoring_golden_dir := "tests/golden/athanor/helmetica-framework/helmetica-framework/monitoring/prometheus"
+MONITORING_NAMESPACE := "syn-helmetica-framework-monitoring"

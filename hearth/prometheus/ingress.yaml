@@ -1,0 +1,56 @@
+# Reaches Prometheus and Alertmanager from the host, through istio on localhost:8088.
+#
+# Not part of the component's golden files: production has no ingress for them. The
+# Prometheus Service exists because the operator only creates the headless
+# prometheus-operated one.
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: syn-helmetica-framework-monitoring
+spec:
+  selector:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/instance: stack
+  ports:
+    - name: web
+      port: 9090
+      targetPort: web
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: prometheus
+  namespace: syn-helmetica-framework-monitoring
+spec:
+  # No ingressClassName: istio is the default class (hearth/istio/ingressclass.yaml).
+  rules:
+    - host: prometheus.127.0.0.1.nip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: prometheus
+                port:
+                  number: 9090
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: alertmanager
+  namespace: syn-helmetica-framework-monitoring
+spec:
+  rules:
+    - host: alertmanager.127.0.0.1.nip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                # Created by the component (14_alertmanager.yaml).
+                name: alertmanager
+                port:
+                  number: 9093
