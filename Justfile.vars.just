@@ -23,7 +23,7 @@ ISTIO_VERSION := "1.31.1"
 # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
 GATEWAY_API_VERSION := "v1.6.2"
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-PROMETHEUS_CHART_VERSION := "92.3.0"
+PROMETHEUS_CHART_VERSION := "92.9.0"
 # renovate: datasource=helm depName=k8up registryUrl=https://k8up-io.github.io/k8up
 K8UP_CHART_VERSION := "4.10.0"
 # renovate: datasource=github-releases depName=k8up-io/k8up
