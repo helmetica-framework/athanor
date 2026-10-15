@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/go:dev-1.26-bookworm
+FROM mcr.microsoft.com/devcontainers/go:dev-1.27-trixie
 
 ARG TARGETOS
 ARG TARGETARCH
