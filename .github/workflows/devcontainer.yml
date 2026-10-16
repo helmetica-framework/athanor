@@ -5,12 +5,14 @@ on:
     paths:
       - .devcontainer/**
       - .github/workflows/devcontainer.yml
+      - Justfile*
   push:
     branches:
       - main
     paths:
       - .devcontainer/**
       - .github/workflows/devcontainer.yml
+      - Justfile*
   workflow_dispatch:
 
 env:

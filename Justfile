@@ -70,17 +70,37 @@ certmanager-setup $KUBECONFIG=kind_kubeconfig:
     kubectl -n cert-manager wait --for condition=Available deployment/cert-manager-webhook --timeout 120s
     kubectl -n cert-manager wait --for condition=Available deployment/cert-manager-cainjector --timeout 120s
 
-# Install prometheus stack
+# Install the monitoring stack (prometheus operator, Prometheus, Alertmanager) from the helmetica-framework component's golden files
 prometheus-setup $KUBECONFIG=kind_kubeconfig:
-    helm upgrade --install kube-prometheus \
-        --repo https://prometheus-community.github.io/helm-charts \
-        --version {{ PROMETHEUS_CHART_VERSION }} \
-        --create-namespace \
-        --namespace prometheus-system \
-        --wait \
-        --values {{ PROM_VALUES }} \
-        kube-prometheus-stack
-    kubectl -n prometheus-system wait --for condition=Available deployment/kube-prometheus-kube-prome-operator --timeout 120s
+    #!/usr/bin/env bash
+    set -euo pipefail
+    src=$(mktemp -d)
+    trap 'rm -rf "$src"' EXIT
+    git clone --quiet --depth 1 --filter=blob:none --sparse \
+    	--branch {{ HELMETICA_FRAMEWORK_COMPONENT_REF }} {{ HELMETICA_FRAMEWORK_COMPONENT_REPO }} "$src"
+    git -C "$src" sparse-checkout set {{ monitoring_golden_dir }}
+    golden="$src/{{ monitoring_golden_dir }}"
+    # The component ships the operator but not its CRDs. We install them from the prometheus repository and match the 
+    # version from the operator image in the component to ensure the CRD and operator version match.
+    version=$(sed -nE 's|.*image: .*/prometheus-operator/prometheus-operator:(v[^[:space:]]+).*|\1|p' "$golden/05_operator.yaml")
+    [ -n "$version" ] || { echo "no prometheus-operator image in $golden/05_operator.yaml" >&2; exit 1; }
+    crds=()
+    for crd in alertmanagerconfigs alertmanagers podmonitors probes prometheusagents prometheuses prometheusrules scrapeconfigs servicemonitors thanosrulers; do
+    	kubectl apply --server-side --force-conflicts -f "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$version/example/prometheus-operator-crd/monitoring.coreos.com_$crd.yaml"
+    	crds+=("crd/$crd.monitoring.coreos.com")
+    done
+    ok=0
+    for i in $(seq 1 10); do
+    	if kubectl wait --for condition=Established "${crds[@]}" --timeout 10s 2>/dev/null; then ok=1; break; fi
+    	sleep 1
+    done
+    [ $ok -eq 1 ]
+
+    kubectl apply --server-side -f "$golden"
+    kubectl apply --server-side -f hearth/prometheus/ingress.yaml
+    kubectl -n {{ MONITORING_NAMESPACE }} wait --for condition=Available deployment/prometheus-operator --timeout 120s
+    kubectl -n {{ MONITORING_NAMESPACE }} wait --for condition=Available prometheus/stack --timeout 300s
+    kubectl -n {{ MONITORING_NAMESPACE }} wait --for condition=Available alertmanager/alertmanager --timeout 300s
 
 # Install istio as ingress controller and Gateway API implementation into kind
 istio-setup $KUBECONFIG=kind_kubeconfig:

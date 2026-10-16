@@ -94,7 +94,11 @@ This creates the kind cluster and installs the modules from the `hearth/` folder
 * The [Gateway API](https://gateway-api.sigs.k8s.io/) CRDs (experimental channel, for
   `TCPRoute`)
 * [metallb](https://metallb.io/) so `LoadBalancer` services get IPs
-* [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) for monitoring
+* The monitoring stack (prometheus operator, Prometheus, Alertmanager) in
+  `syn-helmetica-framework-monitoring`, applied from the athanor golden files of
+  [component-helmetica-framework](https://github.com/vshn/component-helmetica-framework), so it
+  matches production. Like there, Prometheus only picks up monitors and rules in namespaces
+  labelled `helmetica.io/monitoring`.
 * [k8up](https://k8up.io/) for backups
 * [cert-manager](https://cert-manager.io/) for certificates
 * [COSI](https://container-object-storage-interface.sigs.k8s.io/) (the `objectstorage.k8s.io`
