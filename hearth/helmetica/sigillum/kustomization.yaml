@@ -4,10 +4,10 @@ kind: Kustomization
 namespace: hel-sigillum
 
 resources:
-  - github.com/helmetica-framework/sigillum//config/crd?ref=v0.0.1
-  - github.com/helmetica-framework/sigillum//config/default?ref=v0.0.1
+  - github.com/helmetica-framework/sigillum//config/crd?ref=v0.1.0
+  - github.com/helmetica-framework/sigillum//config/default?ref=v0.1.0
 
 images:
   # manager.yaml hardcodes :latest
   - name: ghcr.io/helmetica-framework/sigillum
-    newTag: v0.0.1
+    newTag: v0.1.0
