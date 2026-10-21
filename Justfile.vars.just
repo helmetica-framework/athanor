@@ -21,7 +21,7 @@ DOCKER_NETWORK := "kind"
 ISTIO_VERSION := "1.31.1"
 # The experimental channel: Istio's TCP support needs UDPRoute, which standard lacks.
 # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
-GATEWAY_API_VERSION := "v1.6.2"
+GATEWAY_API_VERSION := "v1.6.3"
 # renovate: datasource=helm depName=k8up registryUrl=https://k8up-io.github.io/k8up
 K8UP_CHART_VERSION := "4.10.0"
 # renovate: datasource=github-releases depName=k8up-io/k8up
