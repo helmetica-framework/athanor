@@ -18,7 +18,7 @@ DOCKER_NETWORK := "kind"
 
 # Module versions
 # renovate: datasource=helm depName=istiod registryUrl=https://blob.istio.io/istio-release/charts
-ISTIO_VERSION := "1.31.1"
+ISTIO_VERSION := "1.31.3"
 # The experimental channel: Istio's TCP support needs UDPRoute, which standard lacks.
 # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
 GATEWAY_API_VERSION := "v1.6.2"
