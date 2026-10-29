@@ -214,9 +214,11 @@ trustbundle-setup $KUBECONFIG=kind_kubeconfig: registry-setup
     # ignite` is meant to be re-runnable, so this must not fail on an existing namespace.
     kubectl create ns hel-flux --dry-run=client -o yaml | kubectl apply -f -
     kubectl -n kube-system get secret tls-server-certificate -o jsonpath='{.data.ca\.crt}' | base64 -d >> "$bundle"
+    # Server-side: a client-side apply copies the whole bundle into the last-applied
+    # annotation, which is capped at 256 KiB. macOS's roots alone are larger than that.
     kubectl -n hel-flux create configmap athanor-trust-bundle \
         --from-file=ca-certificates.crt="$bundle" \
-        --dry-run=client -o yaml | kubectl apply -f -
+        --dry-run=client -o yaml | kubectl apply --server-side -f -
 
 # Install the helmetica operators (adept, chrysopoeia, harness proxy, sigillum, ampulla, libra, custos) into kind
 #
