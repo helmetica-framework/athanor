@@ -10,6 +10,7 @@ resources:
   - chrysopoeia-flux
   - sigillum
   - ampulla
+  - libra
   # Binds to a ClusterRole chrysopoeia owns and borrows its instance-admin
   # ServiceAccount to run gather Jobs, so it only works alongside it.
   - custos

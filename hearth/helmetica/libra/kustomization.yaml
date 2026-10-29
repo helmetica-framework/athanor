@@ -1,0 +1,60 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: hel-libra
+
+resources:
+  # config/default deliberately leaves the CRDs out, so both are listed here.
+  - github.com/helmetica-framework/libra//config/crd?ref=v0.0.1
+  - github.com/helmetica-framework/libra//config/default?ref=v0.0.1
+  - bucket.yaml
+
+images:
+  # manager.yaml hardcodes :latest
+  - name: ghcr.io/helmetica-framework/libra
+    newTag: v0.0.1
+
+patches:
+  - target:
+      kind: Deployment
+      name: libra-controller-manager
+    patch: |
+      - op: test
+        path: /spec/template/spec/containers/0/name
+        value: manager
+      # The base reads its S3 settings from a hand-made secret `libra-s3`. Here the bucket
+      # comes from COSI (bucket.yaml), whose secret uses different key names.
+      - op: remove
+        path: /spec/template/spec/containers/0/envFrom
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: S3_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: libra-billing
+              key: COSI_S3_ENDPOINT
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: S3_BUCKET
+          valueFrom:
+            secretKeyRef:
+              name: libra-billing
+              key: COSI_S3_BUCKET_ID
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: libra-billing
+              key: COSI_S3_ACCESS_KEY_ID
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: libra-billing
+              key: COSI_S3_ACCESS_SECRET_KEY

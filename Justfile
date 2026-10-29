@@ -208,10 +208,11 @@ trustbundle-setup $KUBECONFIG=kind_kubeconfig: registry-setup
         --from-file=ca-certificates.crt="$bundle" \
         --dry-run=client -o yaml | kubectl apply -f -
 
-# Install the helmetica operators (adept, chrysopoeia, harness proxy, sigillum, ampulla, custos) into kind
+# Install the helmetica operators (adept, chrysopoeia, harness proxy, sigillum, ampulla, libra, custos) into kind
 #
 # garage and k8up are dependencies because of ampulla: it watches COSI's and k8up's CRDs and
-# defaults every policy to the `garage` classes hearth/garage/cosi.yaml installs.
+# defaults every policy to the `garage` classes hearth/garage/cosi.yaml installs. libra also
+# gets its bucket from garage.
 helmetica-setup $KUBECONFIG=kind_kubeconfig: certmanager-setup prometheus-setup registry-setup trustbundle-setup garage-setup k8up-setup
     {{ KUSTOMIZE_CMD }} build hearth/helmetica | kubectl apply --server-side -f -
     # Namespaces are set in hearth/helmetica/*/kustomization.yaml; keep these in sync.
@@ -220,4 +221,5 @@ helmetica-setup $KUBECONFIG=kind_kubeconfig: certmanager-setup prometheus-setup 
     kubectl -n hel-chrysopoeia wait --for condition=Available deployment/chrysopoeia-controller-manager --timeout 120s
     kubectl -n hel-chrysopoeia-proxy wait --for condition=Available deployment/chrysopoeia-proxy --timeout 120s
     kubectl -n hel-ampulla wait --for condition=Available deployment/ampulla-controller-manager --timeout 120s
+    kubectl -n hel-libra wait --for condition=Available deployment/libra-controller-manager --timeout 180s
     kubectl -n hel-custos wait --for condition=Available deployment/custos-controller-manager --timeout 120s
