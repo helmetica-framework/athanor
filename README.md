@@ -32,6 +32,9 @@ devcontainer up --workspace-folder .
 devcontainer exec --workspace-folder . zsh
 ```
 
+The devcontainer CLI does not forward the ports listed below ([devcontainers/cli#186](https://github.com/devcontainers/cli/issues/186)).
+Ingress, the registry and the API server are then reachable only from inside the container, until VS Code attaches to it and forwards them.
+
 ### What's inside
 
 The devcontainer ships all tooling needed for development:
@@ -77,6 +80,14 @@ Running any container engine rootless (Podman, rootless containerd/nerdctl, or r
 The same applies to MacOS, because there containers run in a VM.
 
 Ingress is unaffected — the istio ingress gateway uses node ports via the cluster's `extraPortMappings`, so `localhost:8088`/`localhost:8443` work as usual. For a `LoadBalancer` service, use `kubectl port-forward` instead.
+
+## macOS
+
+The devcontainer runs on macOS with Docker Desktop. A few things behave differently than on Linux:
+
+* **Port 5000 is taken by AirPlay Receiver.** kind maps the registry to `localhost:5000`, so a native `just ignite` cannot bind it. Turn AirPlay Receiver off under System Settings, General, AirDrop & Handoff. Inside the devcontainer the cluster binds the port in the container, so only the forward to the host is affected.
+* **Give Docker Desktop room.** The furnace runs two kind nodes with the monitoring stack, flux, the helmetica operators and Garage. With 8 GB of memory it runs, but tightly. A full Docker disk shows up as flux reporting `no space left on device` and a touchstone timing out on an `OCIRepository` that never turns ready, which reads like a chart problem. Check `docker system df` first.
+* **Keep the Mac awake during long runs.** When it sleeps, the container loses DNS and a running touchstone fails with `no such host`. Prefix the command with `caffeinate -i`.
 
 ## Igniting the furnace
 

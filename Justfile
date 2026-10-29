@@ -199,7 +199,17 @@ trustbundle-setup $KUBECONFIG=kind_kubeconfig: registry-setup
     set -euo pipefail
     bundle=$(mktemp)
     trap 'rm -f "$bundle"' EXIT
-    cat /etc/ssl/certs/ca-certificates.crt > "$bundle"
+    # The host's public roots live in a different file per OS: Debian/Ubuntu, Fedora/RHEL
+    # and macOS, in that order.
+    roots=""
+    for candidate in /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt /etc/ssl/cert.pem; do
+    	if [ -f "$candidate" ]; then roots=$candidate; break; fi
+    done
+    if [ -z "$roots" ]; then
+    	echo "no CA bundle found on this host" >&2
+    	exit 1
+    fi
+    cat "$roots" > "$bundle"
     # Created here so the bundle can be placed before the flux module is applied. `just
     # ignite` is meant to be re-runnable, so this must not fail on an existing namespace.
     kubectl create ns hel-flux --dry-run=client -o yaml | kubectl apply -f -
