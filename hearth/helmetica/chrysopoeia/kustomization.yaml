@@ -6,6 +6,7 @@ namespace: hel-chrysopoeia
 resources:
   - github.com/helmetica-framework/chrysopoeia//config/crd?ref=v0.1.0-dev25
   - github.com/helmetica-framework/chrysopoeia//config/default?ref=v0.1.0-dev25
+  - platform-values.yaml
 
 images:
   # manager.yaml hardcodes :latest
