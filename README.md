@@ -85,8 +85,9 @@ Ingress is unaffected — the istio ingress gateway uses node ports via the clus
 
 The devcontainer runs on macOS with Docker Desktop. A few things behave differently than on Linux:
 
-* **Port 5000 is taken by AirPlay Receiver.** kind maps the registry to `localhost:5000`, so a native `just ignite` cannot bind it. Turn AirPlay Receiver off under System Settings, General, AirDrop & Handoff. Inside the devcontainer the cluster binds the port in the container, so only the forward to the host is affected.
+* **Port 5000 is taken by AirPlay Receiver.** kind maps the registry to `localhost:5000`, so a native `just ignite` fails with `bind: address already in use`. Turn AirPlay Receiver off under System Settings, General, AirDrop & Handoff, and check with `lsof -nP -iTCP:5000 -sTCP:LISTEN` that nothing listens any more. The toggle is the only switch that sticks: on macOS 15, setting `AirplayRecieverEnabled` with `defaults write` and restarting ControlCenter frees the port only until ControlCenter comes back up. Inside the devcontainer the cluster binds the port in the container, so only the forward to the host is affected.
 * **Give Docker Desktop room.** The furnace runs two kind nodes with the monitoring stack, flux, the helmetica operators and Garage. With 8 GB of memory it runs, but tightly. A full Docker disk shows up as flux reporting `no space left on device` and a touchstone timing out on an `OCIRepository` that never turns ready, which reads like a chart problem. Check `docker system df` first.
+* **Leave room on the Mac's own disk too.** Docker Desktop keeps everything in one disk image (`Docker.raw`) that grows on the Mac's disk up to its configured size. With the Mac's disk nearly full, Docker's writes can fail: `docker rm` reports `input/output error` and `docker ps` keeps showing a dead container as `Up`. Free space on the Mac, then restart Docker Desktop (`docker desktop restart`).
 * **Keep the Mac awake during long runs.** When it sleeps, the container loses DNS and a running touchstone fails with `no such host`. Prefix the command with `caffeinate -i`.
 
 ## Igniting the furnace
