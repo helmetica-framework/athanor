@@ -158,6 +158,8 @@ Editing a module's values file (e.g. `hearth/traefik/values.yaml`) and re-runnin
 
 Then put the service charts (reagents) into the `reagents/` folder and develop away.
 
+Some reagents pull their prima materia from a git submodule instead of a chart repository. `reagent-redis`, for example, takes `redis-ha` from `dependencies/dandy-charts`. Clone them with `--recurse-submodules`, and after a `git pull` run `git submodule update --init`. Otherwise the touchstone's publish step fails with `Error: directory dependencies/dandy-charts/charts/redis-ha not found`.
+
 ## Quenching it
 
 To stop and delete the cluster:
