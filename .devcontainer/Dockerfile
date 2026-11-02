@@ -10,6 +10,7 @@ ENV JUSTVERSION="1.58.0"
 ENV KREWVERSION="0.5.0"
 
 ENV GOEXPERIMENT="jsonv2"
+ENV GOTOOLCHAIN="auto"
 
 # Install kubecolor
 RUN curl -L -o kubecolor.tar.gz https://github.com/kubecolor/kubecolor/releases/download/v${KUBECOLORVERSION}/kubecolor_${KUBECOLORVERSION}_linux_${TARGETARCH}.tar.gz && tar -xvzf kubecolor.tar.gz && install -c -m 0755 kubecolor /usr/local/bin
