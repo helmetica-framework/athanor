@@ -5,13 +5,13 @@ namespace: hel-custos
 
 resources:
   # config/default deliberately leaves the CRDs out, so both are listed here.
-  - github.com/helmetica-framework/custos//config/crd?ref=v0.0.2
-  - github.com/helmetica-framework/custos//config/default?ref=v0.0.2
+  - github.com/helmetica-framework/custos//config/crd?ref=v0.1.0
+  - github.com/helmetica-framework/custos//config/default?ref=v0.1.0
 
 images:
   # manager.yaml hardcodes :latest
   - name: ghcr.io/helmetica-framework/custos
-    newTag: v0.0.2
+    newTag: v0.1.0
 
 patches:
   - target:
@@ -33,4 +33,4 @@ patches:
       # renovate: datasource=docker depName=ghcr.io/helmetica-framework/custos
       - op: replace
         path: /spec/template/spec/containers/0/args/3
-        value: --gather-image=ghcr.io/helmetica-framework/custos:v0.0.2
+        value: --gather-image=ghcr.io/helmetica-framework/custos:v0.1.0
