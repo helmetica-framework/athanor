@@ -29,7 +29,7 @@ K8UP_CRD_VERSION := "v2.16.0"
 # renovate: datasource=github-releases depName=cert-manager/cert-manager
 CERTMANAGER_VERSION := "v1.21.3"
 # renovate: datasource=github-releases depName=metallb/metallb
-METALLB_VERSION := "v0.16.0"
+METALLB_VERSION := "v0.16.2"
 # renovate: datasource=docker depName=ghcr.io/rajsinghtech/charts/garage-operator
 GARAGE_OPERATOR_CHART_VERSION := "0.8.2"
 # The COSI API itself: CRDs and the central controller, neither of which is released as a
