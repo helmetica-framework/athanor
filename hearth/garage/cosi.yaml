@@ -6,14 +6,11 @@ metadata:
   name: garage
 spec:
   driverName: garage.rajsingh.info
-  # Delete: a bucket goes away with its claim, and so do the backups in it. This is a
-  # scratch cluster, where leaving buckets behind only makes `just quench` less complete.
-  #
-  # Garage's admin API refuses to delete a bucket that still holds objects, and its operator
-  # will not purge one for you - so this policy only works because ampulla empties the bucket
-  # itself before releasing the claim to COSI. A driver-provisioned bucket claimed by
-  # anything else still needs emptying by hand.
-  deletionPolicy: Delete
+  # Retain: Garage never deletes data, and its driver refuses to delete a bucket that still
+  # holds objects. With Delete, removing the claim of a bucket that holds a backup blocks on
+  # the driver forever, and so does the instance namespace around it. The Bucket and its
+  # data outlive the claim instead.
+  deletionPolicy: Retain
   parameters:
     clusterRef: garage
     clusterNamespace: garage-system
