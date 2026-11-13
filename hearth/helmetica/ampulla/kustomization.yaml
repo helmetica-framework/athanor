@@ -4,8 +4,8 @@ kind: Kustomization
 namespace: hel-ampulla
 
 resources:
-  - github.com/helmetica-framework/ampulla//config/crd?ref=v0.1.0
-  - github.com/helmetica-framework/ampulla//config/default?ref=v0.1.0
+  - github.com/helmetica-framework/ampulla//config/crd?ref=v0.1.2
+  - github.com/helmetica-framework/ampulla//config/default?ref=v0.1.2
 
 images:
   # manager.yaml hardcodes :latest
