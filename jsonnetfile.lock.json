@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "dependencies": [
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/helmetica-framework/alembic.git",
+          "subdir": ""
+        }
+      },
+      "version": "85611e194bbbb846a68e4e5fc09d082486805c80",
+      "sum": "s/M4ThcbGEVFUPNlHhJcorPq5RgC+y/o3L+z7nEUTg4="
+    }
+  ],
+  "legacyImports": false
+}

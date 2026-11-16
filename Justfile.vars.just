@@ -44,3 +44,12 @@ HELMETICA_FRAMEWORK_COMPONENT_REF := "master"
 HELMETICA_FRAMEWORK_COMPONENT_REPO := "https://github.com/vshn/component-helmetica-framework.git"
 monitoring_golden_dir := "tests/golden/athanor/helmetica-framework/helmetica-framework/monitoring/prometheus"
 MONITORING_NAMESPACE := "syn-helmetica-framework-monitoring"
+
+# renovate: datasource=go depName=github.com/jsonnet-bundler/jsonnet-bundler
+jb_version := "v0.6.0"
+jb := "go run github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@" + jb_version
+
+# renovate: datasource=go depName=github.com/google/go-jsonnet
+jsonnet_version := "v0.22.0"
+jsonnet := "go run github.com/google/go-jsonnet/cmd/jsonnet@" + jsonnet_version
+manifests_dir := justfile_directory() / "hearth" / "helmetica" / "render"
