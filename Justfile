@@ -71,36 +71,11 @@ certmanager-setup $KUBECONFIG=kind_kubeconfig:
     kubectl -n cert-manager wait --for condition=Available deployment/cert-manager-cainjector --timeout 120s
 
 # Install the monitoring stack (prometheus operator, Prometheus, Alertmanager) from the helmetica-framework component's golden files
-prometheus-setup $KUBECONFIG=kind_kubeconfig:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    src=$(mktemp -d)
-    trap 'rm -rf "$src"' EXIT
-    git clone --quiet --depth 1 --filter=blob:none --sparse \
-    	--branch {{ HELMETICA_FRAMEWORK_COMPONENT_REF }} {{ HELMETICA_FRAMEWORK_COMPONENT_REPO }} "$src"
-    git -C "$src" sparse-checkout set {{ monitoring_golden_dir }}
-    golden="$src/{{ monitoring_golden_dir }}"
-    # The component ships the operator but not its CRDs. We install them from the prometheus repository and match the 
-    # version from the operator image in the component to ensure the CRD and operator version match.
-    version=$(sed -nE 's|.*image: .*/prometheus-operator/prometheus-operator:(v[^[:space:]]+).*|\1|p' "$golden/05_operator.yaml")
-    [ -n "$version" ] || { echo "no prometheus-operator image in $golden/05_operator.yaml" >&2; exit 1; }
-    crds=()
-    for crd in alertmanagerconfigs alertmanagers podmonitors probes prometheusagents prometheuses prometheusrules scrapeconfigs servicemonitors thanosrulers; do
-    	kubectl apply --server-side --force-conflicts -f "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$version/example/prometheus-operator-crd/monitoring.coreos.com_$crd.yaml"
-    	crds+=("crd/$crd.monitoring.coreos.com")
-    done
-    ok=0
-    for i in $(seq 1 10); do
-    	if kubectl wait --for condition=Established "${crds[@]}" --timeout 10s 2>/dev/null; then ok=1; break; fi
-    	sleep 1
-    done
-    [ $ok -eq 1 ]
-
-    kubectl apply --server-side -f "$golden"
-    kubectl apply --server-side -f hearth/prometheus/ingress.yaml
-    kubectl -n {{ MONITORING_NAMESPACE }} wait --for condition=Available deployment/prometheus-operator --timeout 120s
-    kubectl -n {{ MONITORING_NAMESPACE }} wait --for condition=Available prometheus/stack --timeout 300s
-    kubectl -n {{ MONITORING_NAMESPACE }} wait --for condition=Available alertmanager/alertmanager --timeout 300s
+prometheus-setup $KUBECONFIG=kind_kubeconfig: render
+  kubectl apply --server-side -f {{ manifests_dir }}/monitoring/04_crds.yaml
+  kubectl apply --server-side -f {{ manifests_dir }}/monitoring
+  kubectl apply --server-side -f hearth/prometheus/ingress.yaml
+  kubectl -n syn-helmetica-framework-monitoring wait --for condition=Available deployment --all --timeout 180s
 
 # Install istio as ingress controller and Gateway API implementation into kind
 istio-setup $KUBECONFIG=kind_kubeconfig:
@@ -202,9 +177,9 @@ trustbundle-setup $KUBECONFIG=kind_kubeconfig: registry-setup
     cat /etc/ssl/certs/ca-certificates.crt > "$bundle"
     # Created here so the bundle can be placed before the flux module is applied. `just
     # ignite` is meant to be re-runnable, so this must not fail on an existing namespace.
-    kubectl create ns hel-flux --dry-run=client -o yaml | kubectl apply -f -
+    kubectl create ns syn-helmetica-framework --dry-run=client -o yaml | kubectl apply -f -
     kubectl -n kube-system get secret tls-server-certificate -o jsonpath='{.data.ca\.crt}' | base64 -d >> "$bundle"
-    kubectl -n hel-flux create configmap athanor-trust-bundle \
+    kubectl -n syn-helmetica-framework create configmap athanor-trust-bundle \
         --from-file=ca-certificates.crt="$bundle" \
         --dry-run=client -o yaml | kubectl apply -f -
 
@@ -213,13 +188,20 @@ trustbundle-setup $KUBECONFIG=kind_kubeconfig: registry-setup
 # garage and k8up are dependencies because of ampulla: it watches COSI's and k8up's CRDs and
 # defaults every policy to the `garage` classes hearth/garage/cosi.yaml installs. libra also
 # gets its bucket from garage.
-helmetica-setup $KUBECONFIG=kind_kubeconfig: certmanager-setup prometheus-setup registry-setup trustbundle-setup garage-setup k8up-setup
-    {{ KUSTOMIZE_CMD }} build hearth/helmetica | kubectl apply --server-side -f -
-    # Namespaces are set in hearth/helmetica/*/kustomization.yaml; keep these in sync.
-    kubectl -n hel-flux wait --for condition=Available deployment --all --timeout 180s
-    kubectl -n hel-adept wait --for condition=Available deployment/adept-controller-manager --timeout 120s
-    kubectl -n hel-chrysopoeia wait --for condition=Available deployment/chrysopoeia-controller-manager --timeout 120s
-    kubectl -n hel-chrysopoeia-proxy wait --for condition=Available deployment/chrysopoeia-proxy --timeout 120s
-    kubectl -n hel-ampulla wait --for condition=Available deployment/ampulla-controller-manager --timeout 120s
-    kubectl -n hel-libra wait --for condition=Available deployment/libra-controller-manager --timeout 180s
-    kubectl -n hel-custos wait --for condition=Available deployment/custos-controller-manager --timeout 120s
+helmetica-setup $KUBECONFIG=kind_kubeconfig: certmanager-setup prometheus-setup registry-setup trustbundle-setup garage-setup k8up-setup render
+    kubectl apply --server-side -Rf "{{manifests_dir}}"
+    kubectl -n syn-helmetica-framework wait --for condition=Available deployment --all --timeout 180s
+
+# Install jsonnet dependencies into vendor/.
+vendor:
+    {{jb}} update
+    {{jb}} install
+
+# Render the helmetica framework and monitoring stack for kind
+render: vendor
+    #!/usr/bin/env bash
+    set -euo pipefail
+    rm -rf "{{manifests_dir}}"
+    {{jsonnet}} -S -c -m "{{manifests_dir}}" -J vendor \
+        --tla-code-file settings=hearth/helmetica/render.jsonnet \
+        hearth/helmetica/athanor.jsonnet
