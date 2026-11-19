@@ -42,28 +42,8 @@ function(settings)
     }
     else o;
 
-  local chrysopoeia(o) =
-    if isDeployment('chrysopoeia-controller-manager')(o)
-    then o {
-      spec+: { template+: { spec+: {
-        containers: [
-          if c.name == 'manager' then c {
-            resources: std.get(c, 'resources', {}) + {
-              limits: std.get(std.get(c, 'resources', {}), 'limits', {}) + { memory: '256Mi' },
-            },
-            env+: [ {
-              name: 'GOMEMLIMIT',
-              valueFrom: { resourceFieldRef: { resource: 'limits.memory' } },
-            } ],
-          } else c
-          for c in o.spec.template.spec.containers
-        ],
-      } } },
-    }
-    else o;
-
   local patched = {
-    [file]: [ chrysopoeia(ampulla(flux(m))) for m in rendered[file] ]
+    [file]: [ ampulla(flux(m)) for m in rendered[file] ]
     for file in std.objectFields(rendered)
   };
 
