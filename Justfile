@@ -10,7 +10,7 @@ ignite: digest helmetica-setup
 quench: kind-clean
 
 # Provision cluster without helmetica. Derived from digestio: holding something at a low warmth
-digest: kind-setup metallb-setup istio-setup prometheus-setup k8up-setup certmanager-setup cosi-setup garage-setup registry-setup
+digest: kind-setup metallb-setup istio-setup prometheus-setup k8up-setup certmanager-setup garage-setup registry-setup
 
 # Create the kind cluster
 kind-setup $KUBECONFIG=kind_kubeconfig:
@@ -117,14 +117,10 @@ k8up-setup $KUBECONFIG=kind_kubeconfig:
     kubectl -n k8up-system wait --for condition=Available deployment/k8up --timeout 60s
 
 # Install the COSI API: its CRDs and the controller that turns a BucketClaim into a Bucket
-cosi-setup $KUBECONFIG=kind_kubeconfig:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    for crd in buckets bucketclasses bucketclaims bucketaccessclasses bucketaccesses; do
-    	kubectl apply --server-side -f "https://raw.githubusercontent.com/kubernetes-sigs/container-object-storage-interface/{{ COSI_REVISION }}/client/config/crd/objectstorage.k8s.io_$crd.yaml"
-    done
-    {{ KUSTOMIZE_CMD }} build "github.com/kubernetes-sigs/container-object-storage-interface/controller?ref={{ COSI_REVISION }}" | kubectl apply --server-side -f -
-    kubectl -n container-object-storage-system wait --for condition=Available deployment/container-object-storage-controller --timeout 180s
+cosi-setup $KUBECONFIG=kind_kubeconfig: render
+  kubectl create ns syn-helmetica-framework || true
+  kubectl apply -f hearth/helmetica/render/framework/10_cosi_crds.yaml 
+  kubectl apply -f hearth/helmetica/render/framework/11_cosi.yaml
 
 # Install the garage operator and a single-node Garage cluster as the local S3 backend
 garage-setup $KUBECONFIG=kind_kubeconfig: certmanager-setup cosi-setup

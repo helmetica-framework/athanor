@@ -5,7 +5,6 @@
       'pod-security.kubernetes.io/enforce': 'restricted',
     },
   },
-  cosi: { enabled: false },
   monitoring_stack: {
     enabled: true,
     platform: 'kind',

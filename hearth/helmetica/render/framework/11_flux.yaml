@@ -3587,7 +3587,7 @@ spec:
               fieldPath: "metadata.namespace"
         - name: "SSL_CERT_FILE"
           value: "/etc/trust/ca-certificates.crt"
-        image: "ghcr.io/fluxcd/helm-controller:v1.7.1"
+        image: "ghcr.io/fluxcd/helm-controller:v1.7.2"
         imagePullPolicy: "IfNotPresent"
         livenessProbe:
           httpGet:
@@ -3671,7 +3671,7 @@ spec:
               fieldPath: "metadata.namespace"
         - name: "SSL_CERT_FILE"
           value: "/etc/trust/ca-certificates.crt"
-        image: "ghcr.io/fluxcd/image-reflector-controller:v1.3.0"
+        image: "ghcr.io/fluxcd/image-reflector-controller:v1.3.1"
         imagePullPolicy: "IfNotPresent"
         livenessProbe:
           httpGet:
@@ -3795,7 +3795,7 @@ spec:
           value: "/tmp/.sigstore"
         - name: "SSL_CERT_FILE"
           value: "/etc/trust/ca-certificates.crt"
-        image: "ghcr.io/fluxcd/source-controller:v1.10.1"
+        image: "ghcr.io/fluxcd/source-controller:v1.10.2"
         imagePullPolicy: "IfNotPresent"
         livenessProbe:
           httpGet:

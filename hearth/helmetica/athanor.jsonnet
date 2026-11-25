@@ -74,7 +74,9 @@ function(settings)
       bucketClaims: [
         {
           bucketClaimName: 'libra-billing',
-          accessMode: 'ReadWrite',
+          accessModes: {
+            objectData: 'ReadWrite',
+          },
           accessSecretName: 'libra-billing',
         },
       ],
