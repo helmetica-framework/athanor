@@ -1,0 +1,12 @@
+= Develop
+
+[source,bash]
+----
+just ignite    # create the kind cluster with every module
+just quench    # tear it down
+just vendor    # vendor the jsonnet dependencies
+just render    # render the hearth/ modules
+just docs      # build these docs, fails on warnings
+----
+
+`just --list` shows every recipe, including one `*-setup` recipe per module in `hearth/`.

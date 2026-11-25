@@ -1,0 +1,6 @@
+name: athanor
+title: Athanor
+version: ~
+start_page: ROOT:index.adoc
+nav:
+- modules/ROOT/nav.adoc

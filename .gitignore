@@ -5,6 +5,7 @@
 !.devcontainer/
 !.gitignore
 !README.md
+!docs
 !renovate.json
 !hearth
 !jsonnetfile.json

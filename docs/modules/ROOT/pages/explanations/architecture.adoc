@@ -1,0 +1,12 @@
+= Structure
+
+[source,text]
+----
+.
+├── hearth            # Modules for athanor (one folder per module)
+├── reagents          # Charts to be developed go here
+├── Justfile             # Contains logic to start/stop the devenv
+├── Justfile.vars.just   # Pinned versions of all modules (managed by Renovate)
+├── README.md
+└── renovate.json
+----

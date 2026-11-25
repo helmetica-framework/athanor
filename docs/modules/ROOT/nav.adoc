@@ -1,0 +1,15 @@
+* xref:index.adoc[Overview]
+
+.Tutorials
+* xref:tutorials/getting-started.adoc[Getting started with the devcontainer]
+
+.How-tos
+* xref:how-tos/ignite.adoc[Ignite the furnace]
+* xref:how-tos/run-natively.adoc[Run natively (without the devcontainer)]
+* xref:how-tos/develop.adoc[Develop]
+
+.Explanations
+* xref:explanations/architecture.adoc[Structure]
+
+.References
+* xref:references/configuration.adoc[Configuration]

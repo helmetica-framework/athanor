@@ -1,0 +1,82 @@
+= Ignite the furnace
+
+If you need to (re-)create the cluster manually, simply ignite the furnace to get a kind cluster with all necessary modules:
+
+[source,bash]
+----
+just quench
+just ignite
+----
+
+This creates the kind cluster and installs the modules from the `hearth/` folder:
+
+* https://istio.io/[istio] as ingress controller, reachable on `localhost:8088`/`localhost:8443`,
+  and as `GatewayClass` `istio`. No sidecars: istiod only runs gateways.
+* The https://gateway-api.sigs.k8s.io/[Gateway API] CRDs (experimental channel, for
+  `TCPRoute`)
+* https://metallb.io/[metallb] so `LoadBalancer` services get IPs
+* The monitoring stack (prometheus operator, Prometheus, Alertmanager) in
+  `syn-helmetica-framework-monitoring`, applied from the athanor golden files of
+  https://github.com/vshn/component-helmetica-framework[component-helmetica-framework], so it
+  matches production. Like there, Prometheus only picks up monitors and rules in namespaces
+  labelled `helmetica.io/monitoring`.
+* https://k8up.io/[k8up] for backups
+* https://cert-manager.io/[cert-manager] for certificates
+* https://container-object-storage-interface.sigs.k8s.io/[COSI] (the `objectstorage.k8s.io`
+  CRDs and its central controller) so a `BucketClaim` provisions a real bucket
+* The https://github.com/rajsinghtech/garage-operator[garage operator] with its COSI
+  driver enabled, plus a single-node https://garagehq.deuxfleurs.fr/[Garage] cluster
+* An internal container registry on `localhost:5000` (TLS, self-signed)
+* And of course the helmetica framework
+
+To talk to the cluster from outside the devcontainer, point `kubectl` at the generated kubeconfig:
+
+[source,bash]
+----
+export KUBECONFIG=$(pwd)/.kind/kind-config
+----
+
+== Asking for a bucket
+
+The `garage` `BucketClass` and `BucketAccessClass` are installed and pointed at the local
+Garage cluster, so a claim is all it takes:
+
+[source,yaml]
+----
+apiVersion: objectstorage.k8s.io/v1alpha2
+kind: BucketClaim
+metadata:
+  name: scratch
+  namespace: default
+spec:
+  bucketClassName: garage
+  protocols:
+  - S3
+----
+
+[source,console]
+----
+kubectl get bucketclaims,buckets
+kubectl -n garage-system logs deployment/garage-operator -f
+----
+
+Some handy URLs once the furnace is lit:
+
+* <http://prometheus.127.0.0.1.nip.io:8088>
+* <http://alertmanager.127.0.0.1.nip.io:8088>
+* <http://s3.127.0.0.1.nip.io:8088>
+
+Editing a module's values file (e.g. `hearth/traefik/values.yaml`) and re-running `just ignite` reconciles every module, or run the single recipe (e.g. `just traefik-setup`) to upgrade only that one.
+
+Then put the service charts (reagents) into the `reagents/` folder and develop away.
+
+== Quenching it
+
+To stop and delete the cluster:
+
+[source,bash]
+----
+just quench
+----
+
+`just` (or `just --list`) lists all available recipes.
