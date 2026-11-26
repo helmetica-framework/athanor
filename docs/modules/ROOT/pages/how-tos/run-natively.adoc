@@ -1,0 +1,27 @@
+= Run natively (without the devcontainer)
+
+The devcontainer exists to give you a standardized environment with working Metallb routing. Only use this if the devcontainer setup can't be used.
+
+This is the recommended path on hosts that only have *rootless Podman*, where nesting a docker-in-docker devcontainer is painful.
+Be sure to check (https://kind.sigs.k8s.io/docs/user/rootless/[kind's rootless docs]) before continuing.
+
+== Host tooling
+
+`go`, `just`, `git`, `kubectl`, `helm`, `jq`, `yq`. `kind` and `kustomize` are fetched at pinned versions via `go run`, so they do not need to be installed.
+
+== Igniting natively
+
+kind autodetects the container engine it runs on (docker, podman, or nerdctl):
+
+[source,bash]
+----
+export KUBECONFIG=$(pwd)/.kind/kind-config
+just ignite
+----
+
+== Known limitation: LoadBalancer IPs under rootless container engines
+
+Running any container engine rootless (Podman, rootless containerd/nerdctl, or rootless Docker) puts the container network inside a user network namespace, so the host has no route to the MetalLB address pool. MetalLB still assigns IPs and works *inside* the cluster, but `curl <EXTERNAL-IP>` from the host fails with "no route to host" (https://github.com/kubernetes-sigs/kind/issues/3388[kind#3388]).
+The same applies to MacOS, because there containers run in a VM.
+
+Ingress is unaffected — the istio ingress gateway uses node ports via the cluster's `extraPortMappings`, so `localhost:8088`/`localhost:8443` work as usual. For a `LoadBalancer` service, use `kubectl port-forward` instead.

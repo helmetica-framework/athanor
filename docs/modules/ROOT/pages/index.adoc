@@ -1,0 +1,6 @@
+= Athanor
+
+An alchemist's furnace.
+
+Athanor is a devcontainer-based development environment for Helmetica.
+It provides a local https://kind.sigs.k8s.io/[kind] cluster with all modules needed to develop and test service charts (reagents).
