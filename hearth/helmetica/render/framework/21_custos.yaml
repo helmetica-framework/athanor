@@ -307,7 +307,7 @@ spec:
           valueFrom:
             resourceFieldRef:
               resource: "limits.memory"
-        image: "ghcr.io/helmetica-framework/custos:v0.1.2"
+        image: "ghcr.io/helmetica-framework/custos:v0.1.3"
         livenessProbe:
           httpGet:
             path: "/healthz"

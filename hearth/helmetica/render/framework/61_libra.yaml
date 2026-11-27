@@ -285,7 +285,7 @@ spec:
             secretKeyRef:
               key: "COSI_S3_ACCESS_SECRET_KEY"
               name: "libra-billing"
-        image: "ghcr.io/helmetica-framework/libra:v0.0.1"
+        image: "ghcr.io/helmetica-framework/libra:v0.0.2"
         livenessProbe:
           httpGet:
             path: "/healthz"
